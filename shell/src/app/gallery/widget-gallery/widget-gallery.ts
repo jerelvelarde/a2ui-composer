@@ -16,11 +16,14 @@
 
 import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {PreviewBridgeMessageType} from 'a2ui-bridge';
 import {RenderedFrame} from '../../preview/rendered/rendered-frame';
 import {HostCommunication} from '../../shell/host-communication/host-communication';
 import {CatalogManagement} from '../../storage/catalog-management/catalog-management';
+import {WidgetLibrary} from '../../storage/widget-library/widget-library';
+import {WidgetRecord} from '../../storage/models/widget-storage.model';
 import {
   BASIC_CATALOG_ID,
   WIDGET_GALLERY_PRESETS,
@@ -39,7 +42,7 @@ const WIDGET_GALLERY_SURFACE_ID = 'widget-gallery-preview';
 @Component({
   selector: 'a2ui-composer-widget-gallery',
   standalone: true,
-  imports: [MatCardModule, RenderedFrame],
+  imports: [MatButtonModule, MatCardModule, RenderedFrame],
   templateUrl: './widget-gallery.ng.html',
   styleUrl: './widget-gallery.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -47,6 +50,7 @@ const WIDGET_GALLERY_SURFACE_ID = 'widget-gallery-preview';
 export class WidgetGallery {
   private readonly hostCommunication = inject(HostCommunication);
   private readonly catalogManagement = inject(CatalogManagement);
+  private readonly widgetLibrary = inject(WidgetLibrary);
 
   /** The curated finished-widget presets rendered as grid cards. */
   protected readonly presets = WIDGET_GALLERY_PRESETS;
@@ -104,6 +108,36 @@ export class WidgetGallery {
    */
   protected openCard(preset: WidgetGalleryPreset): void {
     this._selectedPreset.set(preset);
+  }
+
+  /**
+   * Clones a finished-widget preset into the persistent widget library as a new
+   * editable record. The clone receives a fresh `crypto.randomUUID()` identity,
+   * the resolved catalog id, and a deep copy of the preset's component tree
+   * (serialized via `JSON.stringify`, which cannot share references with the
+   * source). The source preset is read only and never mutated, so repeated
+   * clones always yield distinct records.
+   *
+   * The originating pointer event is stopped so cloning from a card does not
+   * also open its read-only preview.
+   *
+   * @param event The originating activation event from the card action.
+   * @param preset The finished-widget preset to clone.
+   */
+  protected async cloneToLibrary(event: Event, preset: WidgetGalleryPreset): Promise<void> {
+    event.stopPropagation();
+
+    const now = Date.now();
+    const record: WidgetRecord = {
+      id: crypto.randomUUID(),
+      catalogId: this.catalogId(),
+      name: `${preset.name} (Copy)`,
+      definition: JSON.stringify(preset.components),
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    await this.widgetLibrary.add(record);
   }
 
   /**

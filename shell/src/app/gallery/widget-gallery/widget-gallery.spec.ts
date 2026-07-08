@@ -18,6 +18,7 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {signal} from '@angular/core';
+import {IDBFactory} from 'fake-indexeddb';
 import {describe, it, expect, beforeEach, afterEach, vi} from 'vitest';
 import {WidgetGallery} from './widget-gallery';
 import {WidgetGalleryHarness} from './test/widget-gallery.harness';
@@ -27,6 +28,8 @@ import {Catalog} from '../../storage/models/catalog-storage.model';
 import {HostCommunication} from '../../shell/host-communication/host-communication';
 import {StartupResolution} from '../../shell/startup-resolution/startup-resolution';
 import {ChatState} from '../../chat/chat-state/chat-state';
+import {WidgetLibrary} from '../../storage/widget-library/widget-library';
+import {WidgetRecord} from '../../storage/models/widget-storage.model';
 
 const KNOWN_CATALOG_ID = 'https://a2ui.org/specification/v0_9/basic_catalog.json';
 
@@ -60,6 +63,15 @@ describe('WidgetGallery Component', () => {
   let setItemSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(async () => {
+    // Real, isolated IndexedDB per test so the (root) WidgetLibrary and its
+    // storage back the clone-to-library flow against a genuine store rather
+    // than a stub. A fresh factory guarantees no bleed between tests.
+    Object.defineProperty(globalThis, 'indexedDB', {
+      value: new IDBFactory(),
+      writable: true,
+      configurable: true,
+    });
+
     // Read-only guard: intercept every localStorage write for the whole test.
     setItemSpy = vi.spyOn(Storage.prototype, 'setItem');
 
@@ -137,5 +149,103 @@ describe('WidgetGallery Component', () => {
     TestBed.flushEffects();
 
     expect(setItemSpy).not.toHaveBeenCalled();
+  });
+
+  describe('clone to library', () => {
+    let library: WidgetLibrary;
+
+    beforeEach(() => {
+      library = TestBed.inject(WidgetLibrary);
+    });
+
+    it('exposes one clone-to-library action per finished-widget card', async () => {
+      const count = await harness.getCloneButtonCount();
+      expect(count).toBe(WIDGET_GALLERY_PRESETS.length);
+    });
+
+    it('writes exactly one new WidgetRecord via WidgetLibrary.add per clone', async () => {
+      const addSpy = vi.spyOn(library, 'add');
+
+      await harness.clickCloneButton(0);
+      await vi.waitFor(() => expect(addSpy).toHaveBeenCalledTimes(1));
+
+      const preset = WIDGET_GALLERY_PRESETS[0];
+      const record = addSpy.mock.calls[0][0] as WidgetRecord;
+
+      // Fresh UUID identity, not the source preset id.
+      expect(typeof record.id).toBe('string');
+      expect(record.id).not.toBe(preset.id);
+      expect(record.id.length).toBeGreaterThan(0);
+
+      // Carries the resolved catalog and a "(Copy)" name.
+      expect(record.catalogId).toBe(KNOWN_CATALOG_ID);
+      expect(record.name).toBe(`${preset.name} (Copy)`);
+
+      // The component tree is copied into the serialized definition.
+      expect(JSON.parse(record.definition)).toEqual(preset.components);
+
+      // Timestamps are populated.
+      expect(typeof record.createdAt).toBe('number');
+      expect(typeof record.updatedAt).toBe('number');
+    });
+
+    it('persists the clone so it is retrievable from the real library afterward', async () => {
+      const addSpy = vi.spyOn(library, 'add');
+
+      await harness.clickCloneButton(0);
+      await vi.waitFor(() => expect(addSpy).toHaveBeenCalledTimes(1));
+      const record = addSpy.mock.calls[0][0] as WidgetRecord;
+
+      // Round-trip: the durable store returns the record by id and via getAll.
+      const fetched = await library.get(record.id);
+      expect(fetched).toEqual(record);
+
+      const all = await library.getAll();
+      expect(all).toContainEqual(record);
+
+      // The reactive collection reflects the persisted clone.
+      expect(library.widgets().some(w => w.id === record.id)).toBe(true);
+    });
+
+    it('leaves the source preset object untouched (deep copy)', async () => {
+      const preset = WIDGET_GALLERY_PRESETS[0];
+      const snapshot = structuredClone(preset);
+      const addSpy = vi.spyOn(library, 'add');
+
+      await harness.clickCloneButton(0);
+      await vi.waitFor(() => expect(addSpy).toHaveBeenCalledTimes(1));
+
+      // No shared-reference mutation: the preset (and its component tree) is
+      // byte-for-byte identical to the pre-clone snapshot.
+      expect(preset).toEqual(snapshot);
+      expect(preset.components).toEqual(snapshot.components);
+    });
+
+    it('produces distinct records with unique ids across repeated clones', async () => {
+      const addSpy = vi.spyOn(library, 'add');
+
+      await harness.clickCloneButton(0);
+      await vi.waitFor(() => expect(addSpy).toHaveBeenCalledTimes(1));
+      await harness.clickCloneButton(0);
+      await vi.waitFor(() => expect(addSpy).toHaveBeenCalledTimes(2));
+
+      const first = addSpy.mock.calls[0][0] as WidgetRecord;
+      const second = addSpy.mock.calls[1][0] as WidgetRecord;
+      expect(first.id).not.toBe(second.id);
+
+      // Both survive in the durable store without id collision.
+      const all = await library.getAll();
+      expect(all).toHaveLength(2);
+      const ids = new Set(all.map(w => w.id));
+      expect(ids.size).toBe(2);
+    });
+
+    it('does not open the preview panel when cloning a card', async () => {
+      await harness.clickCloneButton(0);
+      fixture.detectChanges();
+      TestBed.flushEffects();
+
+      expect(await harness.hasRenderedFrame()).toBe(false);
+    });
   });
 });

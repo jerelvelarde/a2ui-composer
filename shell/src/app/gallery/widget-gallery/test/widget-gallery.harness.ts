@@ -25,6 +25,7 @@ export class WidgetGalleryHarness extends ComponentHarness {
   static hostSelector = 'a2ui-composer-widget-gallery';
 
   private readonly getCards = this.locatorForAll('.widget-card');
+  private readonly getCloneButtons = this.locatorForAll('.widget-clone-button');
   private readonly getRenderedFrame = this.locatorForOptional(RenderedFrameHarness);
 
   /**
@@ -47,6 +48,28 @@ export class WidgetGalleryHarness extends ComponentHarness {
       throw new Error(`No widget card at index ${index}`);
     }
     await card.click();
+  }
+
+  /**
+   * Returns the number of "Clone to library" actions rendered in the grid.
+   */
+  async getCloneButtonCount(): Promise<number> {
+    const buttons = await this.getCloneButtons();
+    return buttons.length;
+  }
+
+  /**
+   * Activates the "Clone to library" action on the card at the given index.
+   *
+   * @param index Zero-based index of the card whose clone action to click.
+   */
+  async clickCloneButton(index: number): Promise<void> {
+    const buttons = await this.getCloneButtons();
+    const button = buttons[index];
+    if (!button) {
+      throw new Error(`No clone button at index ${index}`);
+    }
+    await button.click();
   }
 
   /**

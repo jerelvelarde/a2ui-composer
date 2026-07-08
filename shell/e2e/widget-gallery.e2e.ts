@@ -133,4 +133,88 @@ test.describe('Widget Gallery User Journey', () => {
       contentType: 'image/png',
     });
   });
+
+  test('clones a finished widget into the library and persists it across reload', async ({
+    page,
+  }) => {
+    // Reads all widget-library records straight from the app's IndexedDB store
+    // so the assertion reflects durable persistence, not in-memory UI state.
+    // Opens without a version to avoid forcing a schema upgrade, and tolerates
+    // the store not existing yet by returning an empty list.
+    const readPersistedWidgets = () =>
+      page.evaluate(
+        () =>
+          new Promise<Array<{id: string; name: string; catalogId: string; definition: string}>>(
+            (resolve, reject) => {
+              const request = indexedDB.open('a2ui_composer_db');
+              request.onsuccess = () => {
+                const db = request.result;
+                if (!db.objectStoreNames.contains('widgets')) {
+                  db.close();
+                  resolve([]);
+                  return;
+                }
+                const tx = db.transaction('widgets', 'readonly');
+                const all = tx.objectStore('widgets').getAll();
+                all.onsuccess = () => {
+                  db.close();
+                  resolve(all.result);
+                };
+                all.onerror = () => {
+                  db.close();
+                  reject(all.error);
+                };
+              };
+              request.onerror = () => reject(request.error);
+            },
+          ),
+      );
+
+    // 1. Navigate to home and let the catalog handshake provision the shared
+    //    IndexedDB schema (both stores) before touching the widget store.
+    await page.goto('/?renderer=http://localhost:3456');
+    await expect(page.locator('.workspace-container')).toBeVisible();
+    await expect(page.locator('.header-title')).toContainText('my_basic_catalog');
+    const galleryLink = page.getByRole('link', {name: 'Widget Gallery'});
+    await expect(galleryLink).toBeVisible();
+    await galleryLink.click();
+    await page.waitForURL('**/widget-gallery');
+    await expect(page.locator('.widget-gallery-container')).toBeVisible();
+
+    // 2. The library starts empty.
+    expect(await readPersistedWidgets()).toHaveLength(0);
+
+    // 3. Clone the first finished widget into the library.
+    const cloneButtons = page.locator('.widget-clone-button');
+    await expect(cloneButtons.first()).toBeVisible();
+    const sourceName = (
+      await page.locator('.widget-card').first().locator('mat-card-title').textContent()
+    )?.trim();
+    await cloneButtons.first().click();
+
+    // 4. A new record persists with a fresh id and a "(Copy)" name.
+    await expect.poll(async () => (await readPersistedWidgets()).length).toBe(1);
+    const afterClone = await readPersistedWidgets();
+    expect(afterClone[0].name).toBe(`${sourceName} (Copy)`);
+    expect(afterClone[0].id.length).toBeGreaterThan(0);
+    expect(typeof afterClone[0].catalogId).toBe('string');
+    expect(afterClone[0].catalogId.length).toBeGreaterThan(0);
+
+    // 5. Cloning does not open the read-only preview.
+    await expect(page.locator('a2ui-composer-rendered-frame')).toHaveCount(0);
+
+    // 6. The clone survives a full reload (durable persistence).
+    await page.reload();
+    await expect(page.locator('.widget-gallery-container')).toBeVisible();
+    const afterReload = await readPersistedWidgets();
+    expect(afterReload).toHaveLength(1);
+    expect(afterReload[0].id).toBe(afterClone[0].id);
+
+    // 7. A second clone yields a distinct record without collision.
+    await expect(cloneButtons.first()).toBeVisible();
+    await cloneButtons.first().click();
+    await expect.poll(async () => (await readPersistedWidgets()).length).toBe(2);
+    const bothIds = new Set((await readPersistedWidgets()).map(w => w.id));
+    expect(bothIds.size).toBe(2);
+  });
 });
