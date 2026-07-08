@@ -40,6 +40,13 @@ export const routes: Routes = [
         canActivate: [startupGuard],
       },
       {
+        path: 'scenario-player',
+        loadComponent: () =>
+          import('./scenario-player/scenario-player').then(m => m.ScenarioPlayer),
+        title: 'A2UI Scenario Player',
+        canActivate: [startupGuard],
+      },
+      {
         path: 'settings',
         loadComponent: () => import('./settings/settings-view/settings').then(m => m.Settings),
         title: 'A2UI Composer Settings',
