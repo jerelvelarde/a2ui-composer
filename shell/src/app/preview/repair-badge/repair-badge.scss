@@ -1,0 +1,49 @@
+/**
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+:host {
+  display: inline-flex;
+}
+
+.repair-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background-color: var(--mat-sys-tertiary-container, #ffd8e4);
+  color: var(--mat-sys-on-tertiary-container, #31111d);
+  font-size: var(--mat-sys-label-small-size, 11px);
+  font-weight: var(--mat-sys-title-small-weight, 500);
+  line-height: 1;
+  cursor: default;
+  user-select: none;
+}
+
+.repair-badge-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.repair-badge-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.repair-badge-label {
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
