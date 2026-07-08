@@ -1,0 +1,19 @@
+{
+  "$schema": "https://a2ui.org/specification/v0_9/catalog.json",
+  "catalogId": "https://copilotkit.ai/a2ui/catalogs/flight-dashboard.json",
+  "title": "Flight & Dashboard Catalog",
+  "description": "A differentiated custom catalog of flight-result cards, KPI metrics, dashboard cards, badges, data tables, and pie / bar charts.",
+  "components": {
+    "Title": {"name": "Title"},
+    "Row": {"name": "Row"},
+    "Column": {"name": "Column"},
+    "DashboardCard": {"name": "DashboardCard"},
+    "Metric": {"name": "Metric"},
+    "PieChart": {"name": "PieChart"},
+    "BarChart": {"name": "BarChart"},
+    "Badge": {"name": "Badge"},
+    "DataTable": {"name": "DataTable"},
+    "Button": {"name": "Button"},
+    "FlightCard": {"name": "FlightCard"}
+  }
+}
