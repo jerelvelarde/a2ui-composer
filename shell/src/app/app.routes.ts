@@ -47,6 +47,12 @@ export const routes: Routes = [
         canActivate: [startupGuard],
       },
       {
+        path: 'icons',
+        loadComponent: () => import('./icons/icon-browser/icon-browser').then(m => m.IconBrowser),
+        title: 'A2UI Icon Browser',
+        canActivate: [startupGuard],
+      },
+      {
         path: 'settings',
         loadComponent: () => import('./settings/settings-view/settings').then(m => m.Settings),
         title: 'A2UI Composer Settings',

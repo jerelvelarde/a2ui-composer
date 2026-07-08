@@ -138,6 +138,11 @@ describe('App Routes Active Verification', () => {
     expect(router.url).toBe('/gallery');
   });
 
+  it('activates icon browser pathway on icons route navigation', async () => {
+    await harness.navigateByUrl('/icons');
+    expect(router.url).toBe('/icons');
+  });
+
   it('redirects to settings view when environment evaluates as invalid', async () => {
     mockStartupResolution.isEnvironmentValid.mockReturnValue(false);
     await harness.navigateByUrl('/');
