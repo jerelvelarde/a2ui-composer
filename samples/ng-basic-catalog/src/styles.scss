@@ -14,17 +14,112 @@
  * limitations under the License.
  */
 
+/*
+ * CopilotKit composer theme for the A2UI BasicCatalog (@a2ui/angular).
+ *
+ * The BasicCatalog components are driven entirely by --a2ui-* CSS custom
+ * properties. The values below map CopilotKit's React A2UI renderer look
+ * (apps/widget-builder/src/lib/a2ui-v09-renderer) onto the Angular lib's
+ * variable names so the rendered widgets match our composer: white cards
+ * with a soft shadow and 12px radius, near-black primary, pill buttons,
+ * Plus Jakarta Sans typography.
+ *
+ * Neutral colors are the Tailwind neutral hex equivalents of the React
+ * renderer's oklch tokens (e.g. oklch(0.205 0 0) === #171717).
+ */
+:root,
+body,
+.sandbox-shell {
+  /* --- Palette --- */
+  --a2ui-color-primary: #171717; /* React PRIMARY_COLOR oklch(0.205 0 0) */
+  --a2ui-color-on-primary: #fafafa; /* React PRIMARY_FG oklch(0.985 0 0) */
+  --a2ui-color-secondary: #f5f5f5;
+  --a2ui-color-on-secondary: #171717; /* dark text on white buttons */
+  --a2ui-color-surface: #ffffff; /* React CARD_BG --card #fff */
+  --a2ui-color-on-background: #171717;
+  --a2ui-color-border: #e5e5e5; /* React BORDER_COLOR oklch(0.922 0 0) */
+  --a2ui-color-input: #ffffff;
+  --a2ui-color-on-input: #171717;
+  --a2ui-color-error: #dc2626;
+  --a2ui-text-color: #171717;
+  --a2ui-text-caption-color: #737373; /* React MUTED_FG oklch(0.556 0 0) */
+
+  /* --- Borders & radius --- */
+  --a2ui-border-width: 1px;
+  --a2ui-border-radius: 12px; /* React STANDARD_RADIUS 0.75rem */
+
+  /* --- Spacing scale --- */
+  --a2ui-spacing-xs: 4px;
+  --a2ui-spacing-s: 8px;
+  --a2ui-spacing-m: 16px;
+  --a2ui-spacing-l: 24px;
+  --a2ui-spacing-xl: 32px;
+  --a2ui-column-gap: 4px; /* React Column gap */
+  --a2ui-row-gap: 12px; /* React Row gap */
+
+  /* --- Card (React catalog Card + getBaseContainerStyle) --- */
+  --a2ui-card-background: #ffffff;
+  --a2ui-card-border: 1px solid #e5e5e5;
+  --a2ui-card-border-radius: 12px;
+  --a2ui-card-box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04); /* React CARD_SHADOW */
+  --a2ui-card-padding: 16px; /* React CONTAINER_PADDING */
+  --a2ui-card-margin: 8px;
+
+  /* --- Button (React catalog Button — white pill, secondary style) --- */
+  --a2ui-button-background: #ffffff;
+  --a2ui-button-border: 1px solid #e5e5e5;
+  --a2ui-button-border-radius: 9999px; /* pill */
+  --a2ui-button-font-weight: 600;
+  --a2ui-button-padding: 8px 16px;
+  --a2ui-button-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --a2ui-button-margin: 6px 8px;
+
+  /* --- Typography (React Text variant sizes) --- */
+  --a2ui-font-family-title: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --a2ui-font-size-2xl: 1.5rem; /* h1 */
+  --a2ui-font-size-xl: 1.25rem; /* h2 */
+  --a2ui-font-size-l: 1.1rem; /* h3 */
+  --a2ui-font-size-m: 0.9375rem; /* h4 / paragraph */
+  --a2ui-font-size-s: 0.875rem; /* body / labels */
+  --a2ui-font-size-xs: 0.8rem; /* caption */
+  --a2ui-line-height-body: 1.5;
+  --a2ui-line-height-headings: 1.2;
+
+  /* --- Divider (React Divider — light hairline) --- */
+  --a2ui-divider-border: 1px solid #e5e5e5;
+  --a2ui-divider-spacing: 8px;
+
+  /* --- Image --- */
+  --a2ui-image-border-radius: 8px;
+}
+
 body {
   margin: 0;
   padding: 16px;
-  font-family: sans-serif;
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
   background-color: #ffffff;
   color-scheme: light;
-  color: #333333;
+  color: #171717;
   box-sizing: border-box;
 }
 *,
 *:before,
 *:after {
   box-sizing: inherit;
+}
+
+/*
+ * The BasicCatalog uses native <h1>..<h6> for headings, which default to
+ * bold (700). Our React renderer uses 600 for headings; nudge to match.
+ * Emulated view encapsulation keeps these elements in the light DOM, so a
+ * global selector reaches them.
+ */
+.a2ui-text h1,
+.a2ui-text h2,
+.a2ui-text h3,
+.a2ui-text h4,
+.a2ui-text h5,
+.a2ui-text h6 {
+  font-weight: 600;
 }
