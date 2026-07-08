@@ -24,6 +24,7 @@ import {RouterLink, RouterOutlet} from '@angular/router';
 import {DOCUMENT} from '@angular/common';
 import {IndexedDbStorage} from '../../storage/indexed-db-storage/indexed-db-storage';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {RendererPicker} from '../renderer-picker/renderer-picker';
 import {CatalogManagement} from '../../storage/catalog-management/catalog-management';
 import {AppConfigProvider} from '../../settings/app-config-provider/app-config-provider';
 import {LocalStorageKey} from '../../storage/models/local-storage-keys';
@@ -47,6 +48,7 @@ import {SessionStorageInteractions} from '../../storage/session-storage-interact
     RouterOutlet,
     RouterLink,
     MatTooltipModule,
+    RendererPicker,
   ],
   templateUrl: './composer-shell.ng.html',
   styleUrl: './composer-shell.scss',

@@ -113,6 +113,15 @@ export class CatalogManagement {
   readonly activeCatalogDescription = this._activeCatalogDescription.asReadonly();
 
   private watchdogTimerId: ReturnType<typeof setTimeout> | null = null;
+  private switchWatchdogTimerId: ReturnType<typeof setTimeout> | null = null;
+
+  /**
+   * Milliseconds allowed for a freshly selected renderer to begin its
+   * discovery handshake before the switch is treated as failed. Mirrors the
+   * handshake watchdog budget so an unreachable renderer surfaces an error
+   * instead of hanging.
+   */
+  private static readonly DISCOVERY_WATCHDOG_MS = 5000;
 
   constructor() {
     const destroyRef = inject(DestroyRef);
@@ -120,6 +129,10 @@ export class CatalogManagement {
       if (this.watchdogTimerId !== null) {
         clearTimeout(this.watchdogTimerId);
         this.watchdogTimerId = null;
+      }
+      if (this.switchWatchdogTimerId !== null) {
+        clearTimeout(this.switchWatchdogTimerId);
+        this.switchWatchdogTimerId = null;
       }
     });
 
@@ -131,6 +144,14 @@ export class CatalogManagement {
             if (this._isHandshakeInProgress()) {
               console.warn('Handshake already in progress. Ignoring RENDERER_READY.');
               return of(null);
+            }
+
+            // A valid renderer has announced itself; the handshake watchdog
+            // below now governs discovery, so retire any pending switch
+            // watchdog to avoid a duplicate/leaked timeout.
+            if (this.switchWatchdogTimerId !== null) {
+              clearTimeout(this.switchWatchdogTimerId);
+              this.switchWatchdogTimerId = null;
             }
 
             this._isHandshakeInProgress.set(true);
@@ -160,6 +181,12 @@ export class CatalogManagement {
             if (this.watchdogTimerId !== null) {
               clearTimeout(this.watchdogTimerId);
               this.watchdogTimerId = null;
+            }
+            // Discovery resolved; retire the renderer-switch watchdog too so no
+            // timer survives the completed handshake.
+            if (this.switchWatchdogTimerId !== null) {
+              clearTimeout(this.switchWatchdogTimerId);
+              this.switchWatchdogTimerId = null;
             }
             this._watchdogFired.set(false);
 
@@ -279,6 +306,52 @@ export class CatalogManagement {
         }),
       )
       .subscribe();
+  }
+
+  /**
+   * Prepares the engine for a deliberate renderer switch. Tears down any
+   * in-flight handshake and the previously discovered catalog so no stale
+   * surface or leaked watchdog carries over, then arms a discovery watchdog:
+   * if the newly selected renderer never begins a handshake (e.g. an
+   * unreachable URL that never emits RENDERER_READY), `catalogError` is
+   * surfaced instead of the UI hanging silently. A subsequent RENDERER_READY
+   * retires this watchdog and hands control to the standard handshake flow.
+   */
+  prepareForRendererSwitch(): void {
+    if (this.watchdogTimerId !== null) {
+      clearTimeout(this.watchdogTimerId);
+      this.watchdogTimerId = null;
+    }
+    if (this.switchWatchdogTimerId !== null) {
+      clearTimeout(this.switchWatchdogTimerId);
+      this.switchWatchdogTimerId = null;
+    }
+
+    this._isHandshakeInProgress.set(false);
+    this._watchdogFired.set(false);
+    this._catalogError.set(null);
+    this._activeCatalog.set(null);
+    this._activeCatalogTitle.set('');
+    this._activeCatalogDescription.set('');
+
+    this.switchWatchdogTimerId = setTimeout(() => {
+      if (this.switchWatchdogTimerId === null) {
+        return;
+      }
+      this.switchWatchdogTimerId = null;
+      // Only fail the switch if nothing progressed: a valid renderer would
+      // have retired this watchdog on RENDERER_READY, and a completed
+      // handshake would have populated activeCatalog.
+      if (
+        this._activeCatalog() === null &&
+        this._catalogError() === null &&
+        !this._isHandshakeInProgress()
+      ) {
+        this._watchdogFired.set(true);
+        this._catalogError.set('Renderer discovery timeout: selected renderer did not respond.');
+        console.error('Renderer discovery timeout: selected renderer did not respond.');
+      }
+    }, CatalogManagement.DISCOVERY_WATCHDOG_MS);
   }
 }
 

@@ -106,6 +106,24 @@ export class StartupResolution {
     return this._resolvedUrl();
   }
 
+  /**
+   * Overrides the active renderer URL at runtime (e.g. from the renderer
+   * picker) and persists it so the selection survives reloads. This mutates
+   * the SAME source of truth consumed by the preview iframe binding and by
+   * cross-frame origin validation, so callers that need fresh catalog
+   * discovery simply update this value. No-op when the context is locked
+   * (`allowOverrides: false`), where the host mandates a fixed renderer.
+   *
+   * @param url The renderer URL to activate.
+   */
+  setResolvedRendererUrl(url: string): void {
+    if (this._isLockedContext()) {
+      return;
+    }
+    this._resolvedUrl.set(url);
+    this.localStorageInteractions.setItem(LocalStorageKey.RENDERER_URL, url);
+  }
+
   isContextLocked(): boolean {
     return this._isLockedContext();
   }
