@@ -18,45 +18,201 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--cpk-page-bg, #dedee9);
+  font-family: var(--cpk-font-body, 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif);
+  color: var(--cpk-text-primary, #010507);
 }
+
+/* Signature CopilotKit depth cue: six soft blur circles behind all content. */
+.composer-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.blur-circle {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(103px);
+}
+
+.blur-circle--1 {
+  width: 446px;
+  height: 446px;
+  left: 1040px;
+  top: 11px;
+  background: rgba(255, 172, 77, 0.2);
+}
+
+.blur-circle--2 {
+  width: 609px;
+  height: 609px;
+  left: 1339px;
+  top: 625px;
+  background: #c9c9da;
+}
+
+.blur-circle--3 {
+  width: 609px;
+  height: 609px;
+  left: 670px;
+  top: -365px;
+  background: #c9c9da;
+}
+
+.blur-circle--4 {
+  width: 609px;
+  height: 609px;
+  left: 508px;
+  top: 702px;
+  background: #f3f3fc;
+}
+
+.blur-circle--5 {
+  width: 446px;
+  height: 446px;
+  left: 128px;
+  top: 331px;
+  background: rgba(255, 243, 136, 0.3);
+}
+
+.blur-circle--6 {
+  width: 446px;
+  height: 446px;
+  left: -205px;
+  top: 803px;
+  background: rgba(255, 172, 77, 0.2);
+}
+
 .composer-header {
   position: relative;
   z-index: 2;
   flex-shrink: 0;
-  background-color: var(--mat-sys-surface-container);
-  color: var(--mat-sys-on-surface);
-  border-bottom: 1px solid var(--mat-sys-outline-variant);
-  --mat-toolbar-container-background-color: var(--mat-sys-surface-container);
-  --mat-toolbar-container-text-color: var(--mat-sys-on-surface);
+  background: var(--cpk-glass-bg, rgba(255, 255, 255, 0.5));
+  color: var(--cpk-text-primary, #010507);
+  border-bottom: 1px solid var(--cpk-divider, #dbdbe5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  --mat-toolbar-container-background-color: transparent;
+  --mat-toolbar-container-text-color: var(--cpk-text-primary, #010507);
 }
+
+.header-title {
+  font-weight: 300;
+  font-size: 18px;
+  color: var(--cpk-text-primary, #010507);
+}
+
 .spacer {
   flex: 1 1 auto;
 }
+
 .composer-sidenav-container {
   flex: 1;
   min-height: 0;
-}
-.composer-sidenav {
-  width: 250px;
-  background-color: var(--mat-sys-surface-container);
-  border-right: 1px solid var(--mat-sys-outline-variant);
-  --mat-sidenav-container-shape: 0px;
-  --mat-drawer-container-shape: 0px;
-  border-radius: 0px;
-  --mat-sidenav-background-color: var(--mat-sys-surface-container);
+  position: relative;
+  z-index: 1;
+  background: transparent;
 
-  ::ng-deep .mat-drawer-inner-container {
-    border-radius: 0px;
+  // Let the lavender page + blur circles show through the drawer container.
+  ::ng-deep .mat-drawer-container,
+  &.mat-drawer-container {
+    background-color: transparent;
+    color: var(--cpk-text-primary, #010507);
   }
 }
+
+.composer-sidenav {
+  width: 250px;
+  box-sizing: border-box;
+  margin: 12px;
+  height: calc(100% - 24px);
+  padding: 12px 8px;
+  background: var(--cpk-glass-bg, rgba(255, 255, 255, 0.5));
+  border: 2px solid var(--cpk-glass-border, #ffffff);
+  border-radius: var(--cpk-radius-card, 8px);
+  box-shadow: var(--cpk-shadow-card, 0px 6px 6px -2px rgba(1, 5, 7, 0.08));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  --mat-sidenav-container-shape: 8px;
+  --mat-sidenav-background-color: transparent;
+
+  ::ng-deep .mat-drawer-inner-container {
+    background: transparent;
+    border-radius: var(--cpk-radius-card, 8px);
+    overflow: visible;
+  }
+
+  ::ng-deep .mat-mdc-nav-list {
+    padding-top: 4px;
+  }
+
+  // Nav items: 8px 12px padding, 4px radius, transparent default.
+  ::ng-deep .mat-mdc-list-item {
+    min-height: 40px;
+    padding: 8px 12px;
+    margin: 2px 0;
+    border-radius: var(--cpk-radius-item, 4px);
+    background: transparent;
+    transition: background-color 0.15s ease;
+
+    .mdc-list-item__content,
+    .mat-mdc-list-item-unscoped-content {
+      color: var(--cpk-text-primary, #010507);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    &:hover {
+      background: var(--cpk-glass-bg-hover, rgba(255, 255, 255, 0.5));
+    }
+
+    // Remove Material's default hover/focus overlay so our glass wash shows.
+    .mat-mdc-list-item-interactive::before,
+    .mdc-list-item__ripple::before {
+      opacity: 0;
+    }
+
+    &.nav-item-active {
+      background: var(--cpk-glass-bg-selected, rgba(255, 255, 255, 0.7));
+    }
+  }
+}
+
+.nav-section-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--cpk-text-secondary, #57575b);
+
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--cpk-divider, #dbdbe5);
+  }
+}
+
 .composer-content {
   padding: 0;
   box-sizing: border-box;
   height: 100%;
+  background: transparent;
 }
+
 .hamburger-button {
   margin-right: 8px;
 }
+
 .theme-toggle-button {
   margin-left: 8px;
 }

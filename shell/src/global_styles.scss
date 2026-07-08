@@ -223,14 +223,52 @@ $dark-theme: mat.define-theme(
   }
 }
 
+/**
+ * CopilotKit / AG-UI dojo design system tokens.
+ * Applied to the Angular shell chrome so the composer matches the
+ * CopilotKit look: cool lavender-gray page, frost-glass surfaces,
+ * white glass borders, and Plus Jakarta Sans typography.
+ */
+:root {
+  // CopilotKit palette tokens (consumed by shell + gallery component styles).
+  --cpk-page-bg: #dedee9;
+  --cpk-glass-bg: rgba(255, 255, 255, 0.5);
+  --cpk-glass-bg-selected: rgba(255, 255, 255, 0.7);
+  --cpk-glass-bg-hover: rgba(255, 255, 255, 0.5);
+  --cpk-glass-border: #ffffff;
+  --cpk-text-primary: #010507;
+  --cpk-text-secondary: #57575b;
+  --cpk-text-muted: #838389;
+  --cpk-divider: #dbdbe5;
+  --cpk-radius-item: 4px;
+  --cpk-radius-card: 8px;
+  --cpk-radius-pill: 9999px;
+  --cpk-shadow-card: 0px 6px 6px -2px rgba(1, 5, 7, 0.08);
+  --cpk-shadow-elevated: 0px 16px 24px -8px rgba(1, 5, 7, 0.12);
+  --cpk-font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --cpk-font-mono: 'Spline Sans Mono', ui-monospace, monospace;
+
+  // Retint the Material system tokens the shell chrome reads.
+  --mat-sys-background: #dedee9;
+  --mat-sys-on-background: #010507;
+  --mat-sys-on-surface: #010507;
+}
+
 html,
 body {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: var(--mat-sys-background);
-  color: var(--mat-sys-on-background);
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background-color: var(--cpk-page-bg);
+  color: var(--cpk-text-primary);
+  font-family: var(--cpk-font-body);
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--cpk-font-mono);
 }
 
 /* High-specificity global overrides resolving slide toggle label checks collisions */

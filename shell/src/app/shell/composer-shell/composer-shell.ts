@@ -20,7 +20,7 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatListModule} from '@angular/material/list';
-import {RouterLink, RouterOutlet} from '@angular/router';
+import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {DOCUMENT} from '@angular/common';
 import {IndexedDbStorage} from '../../storage/indexed-db-storage/indexed-db-storage';
 import {MatTooltipModule} from '@angular/material/tooltip';
@@ -46,6 +46,7 @@ import {SessionStorageInteractions} from '../../storage/session-storage-interact
     MatListModule,
     RouterOutlet,
     RouterLink,
+    RouterLinkActive,
     MatTooltipModule,
   ],
   templateUrl: './composer-shell.ng.html',
