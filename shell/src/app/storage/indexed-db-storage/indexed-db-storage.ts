@@ -16,6 +16,12 @@
 
 import {Injectable} from '@angular/core';
 import {CachedCatalogRecord} from '../models/catalog-storage.model';
+import {
+  COMPOSER_DB_NAME,
+  COMPOSER_DB_VERSION,
+  CATALOGS_STORE_NAME,
+  provisionComposerDatabaseSchema,
+} from '../composer-database/composer-database';
 
 @Injectable({
   providedIn: 'root',
@@ -25,9 +31,9 @@ import {CachedCatalogRecord} from '../models/catalog-storage.model';
  * to local IndexedDB instances for schema and catalog caching.
  */
 export class IndexedDbStorage {
-  private dbName = 'a2ui_composer_db';
-  private dbVersion = 1;
-  private storeName = 'catalogs';
+  private dbName = COMPOSER_DB_NAME;
+  private dbVersion = COMPOSER_DB_VERSION;
+  private storeName = CATALOGS_STORE_NAME;
 
   private dbPromise: Promise<IDBDatabase> | null = null;
 
@@ -46,10 +52,9 @@ export class IndexedDbStorage {
 
       request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
         const db = (event.target as IDBOpenDBRequest).result;
-        if (!db.objectStoreNames.contains(this.storeName)) {
-          db.createObjectStore(this.storeName, {keyPath: 'rendererUrl'});
-          console.log(`Initialized object store: ${this.storeName}`);
-        }
+        // Provision the complete shared schema so the database is fully
+        // initialized regardless of which service opens it first.
+        provisionComposerDatabaseSchema(db);
       };
 
       request.onsuccess = (event: Event) => {
