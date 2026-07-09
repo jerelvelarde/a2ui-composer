@@ -52,6 +52,7 @@ class MockChatState {
   readonly isProgrammaticStreamActive = signal(false);
   readonly latestLlmLog = signal<unknown>(null);
   readonly llmHistory = signal<unknown[]>([]);
+  readonly componentNameHealCount = signal(0);
 }
 
 class MockChatCoordinator {

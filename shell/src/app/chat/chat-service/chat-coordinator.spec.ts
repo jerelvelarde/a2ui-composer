@@ -62,6 +62,11 @@ class MockChatState {
   readonly isProgrammaticStreamActive = signal<boolean>(false);
   readonly latestLlmLog = signal<LlmLogEntry | null>(null);
   readonly llmHistory = signal<LlmLogEntry[]>([]);
+  readonly componentNameHealCount = signal<number>(0);
+
+  setComponentNameHealCount(count: number) {
+    this.componentNameHealCount.set(count);
+  }
 
   setChatHistory(history: LlmMessage[]) {
     this.chatHistory.set(history);
@@ -413,6 +418,91 @@ describe('ChatCoordinator Pipeline & State Integration', () => {
     expect(components[1].component).toBe('CheckBox');
     expect(components[2].component).toBe('DateTimeInput');
     expect(components[3].component).toBe('Button'); // fuzzy match success!
+
+    // Every corrected name is surfaced as a heal for the repair badge.
+    expect(chatStateMock.componentNameHealCount()).toBe(4);
+  });
+
+  /* Component-name heal count surfacing assertions */
+  it('surfaces zero heals when every component name already matches', async () => {
+    const cleanRawOutput =
+      '{"version": "v0.9", "createSurface": {"surfaceId": "s2", ' +
+      '"catalogId": "test"}}\n' +
+      '{"version": "v0.9", "updateComponents": {"surfaceId": "s2", ' +
+      '"components": [' +
+      '  {"id": "c1", "component": "TextField"},' +
+      '  {"id": "c2", "component": "CheckBox"}' +
+      ']}}\n';
+
+    llmClientMock.chatStream = vi.fn(async (): Promise<LlmStreamResponse> => {
+      const contentStream: AsyncIterable<string> = {
+        [Symbol.asyncIterator]() {
+          const chunks = [cleanRawOutput];
+          let idx = 0;
+          return {
+            async next(): Promise<IteratorResult<string>> {
+              if (idx < chunks.length) {
+                return {value: chunks[idx++], done: false};
+              }
+              return {value: undefined, done: true};
+            },
+          };
+        },
+      };
+      return {contentStream, complete: Promise.resolve(cleanRawOutput)};
+    });
+
+    catalogManagementMock.activeCatalog.set({
+      catalogId: 'test',
+      components: {TextField: {}, CheckBox: {}},
+    });
+
+    await service.submitPrompt('Clean prompt');
+
+    expect(chatStateMock.componentNameHealCount()).toBe(0);
+  });
+
+  it('recomputes the heal count per render without leaking stale counts', async () => {
+    catalogManagementMock.activeCatalog.set({
+      catalogId: 'test',
+      components: {TextField: {}, CheckBox: {}},
+    });
+
+    const withHeal = (name: string): string =>
+      '{"version": "v0.9", "createSurface": {"surfaceId": "s3", ' +
+      '"catalogId": "test"}}\n' +
+      '{"version": "v0.9", "updateComponents": {"surfaceId": "s3", ' +
+      `"components": [{"id": "c1", "component": "${name}"}]}}\n`;
+
+    const streamRaw = (raw: string) => {
+      llmClientMock.chatStream = vi.fn(async (): Promise<LlmStreamResponse> => {
+        const contentStream: AsyncIterable<string> = {
+          [Symbol.asyncIterator]() {
+            const chunks = [raw];
+            let idx = 0;
+            return {
+              async next(): Promise<IteratorResult<string>> {
+                if (idx < chunks.length) {
+                  return {value: chunks[idx++], done: false};
+                }
+                return {value: undefined, done: true};
+              },
+            };
+          },
+        };
+        return {contentStream, complete: Promise.resolve(raw)};
+      });
+    };
+
+    // First render heals one name.
+    streamRaw(withHeal('textbox'));
+    await service.submitPrompt('First');
+    expect(chatStateMock.componentNameHealCount()).toBe(1);
+
+    // Second render is clean; prior count must not persist.
+    streamRaw(withHeal('TextField'));
+    await service.submitPrompt('Second');
+    expect(chatStateMock.componentNameHealCount()).toBe(0);
   });
 
   it('bubbles connectivity and gateway timeout exceptions to error log', async () => {

@@ -80,6 +80,7 @@ export class ChatCoordinator {
     this.chatState.setPipelineStatus(PipelineStatus.IDLE);
     this.chatState.setProgrammaticStreamActive(false);
     this.chatState.clearRawLlmHistory();
+    this.chatState.setComponentNameHealCount(0);
     this.stateSync.flushDraft();
   }
 
@@ -184,6 +185,10 @@ export class ChatCoordinator {
    * Post-processes, extracts, syntax heals, and validates raw JSON lines.
    */
   private async processRawLlmPayload(rawText: string): Promise<void> {
+    // Reset any prior surface's heal tally so counts never leak across renders,
+    // including renders that fail before the schema check runs.
+    this.chatState.setComponentNameHealCount(0);
+
     // Stage 1: Parse and Syntax Healing
     let parsedBlocks: unknown[] = [];
     try {
@@ -225,8 +230,10 @@ export class ChatCoordinator {
         );
       }
 
-      // Catalog Component Schema Check & Name Typos Healing
-      this.runCatalogComponentSchemaCheck(parsedBlocks);
+      // Catalog Component Schema Check & Name Typos Healing. Surface the
+      // number of silently applied component-name heals for the repair badge.
+      const nameHealCount = this.runCatalogComponentSchemaCheck(parsedBlocks);
+      this.chatState.setComponentNameHealCount(nameHealCount);
 
       // Stage 3: Ready & Commit Layout Wipes
       this.chatState.setPipelineStatus(PipelineStatus.READY);
@@ -339,10 +346,14 @@ export class ChatCoordinator {
    * Validates parsed components against custom catalog schemas, healing name
    * typos, mapping legacy names, and recursively stripping out custom mock
    * rules configurations.
+   *
+   * @returns The number of component-name heals silently applied, i.e. how
+   *     many components had their declared name rewritten to a catalog entry.
    */
-  private runCatalogComponentSchemaCheck(parsedBlocks: unknown[]): void {
+  private runCatalogComponentSchemaCheck(parsedBlocks: unknown[]): number {
     const catalog = this.catalogManagement.activeCatalog();
     const componentHealMap: Record<string, string> = {};
+    let nameHealCount = 0;
 
     if (catalog && catalog['components']) {
       for (const key of Object.keys(catalog['components'])) {
@@ -440,6 +451,12 @@ export class ChatCoordinator {
           }
         }
 
+        // Tally a heal whenever the emitted name differs from what the model
+        // produced (case-insensitive, synonym, or fuzzy resolution).
+        if (targetType !== compType) {
+          nameHealCount++;
+        }
+
         // Recursively strip out dynamic mock setups configuration fields
         const cleanedComp = this.sanitizeComponentObject(compObj);
         // Restore corrected element name
@@ -450,6 +467,8 @@ export class ChatCoordinator {
       // Commit sanitized array back in-place
       updateComponents['components'] = cleanedComponents;
     }
+
+    return nameHealCount;
   }
 
   /**

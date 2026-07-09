@@ -19,6 +19,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ChatPanel} from '../../chat/chat-panel/chat-panel';
 import {RawFrame} from '../../preview/raw/raw-frame';
 import {RenderedFrame} from '../../preview/rendered/rendered-frame';
+import {RepairBadge} from '../../preview/repair-badge/repair-badge';
 import {DataModel} from '../../debug/data-model/data-model';
 import {Events} from '../../debug/events/events';
 import {Errors} from '../../debug/errors/errors';
@@ -53,6 +54,7 @@ interface WorkspaceMessagePayload {
     ChatPanel,
     RawFrame,
     RenderedFrame,
+    RepairBadge,
     DataModel,
     Events,
     Errors,

@@ -43,6 +43,11 @@ class MockChatState {
   readonly isProgrammaticStreamActive = signal(false);
   readonly latestLlmLog = signal<LlmLogEntry | null>(null);
   readonly llmHistory = signal<LlmLogEntry[]>([]);
+  readonly componentNameHealCount = signal<number>(0);
+
+  setComponentNameHealCount(count: number): void {
+    this.componentNameHealCount.set(count);
+  }
 
   setPipelineStatus(status: PipelineStatus): void {
     this.pipelineStatus.set(status);

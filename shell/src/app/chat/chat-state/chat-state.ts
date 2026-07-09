@@ -67,6 +67,13 @@ export class ChatState {
   private readonly _llmHistory = signal<LlmLogEntry[]>([]);
 
   /**
+   * Number of component-name heals silently applied to the most recently
+   * rendered surface. Recomputed per render so counts never leak across
+   * surfaces. Encapsulated as private to enforce transactional writes.
+   */
+  private readonly _componentNameHealCount = signal<number>(0);
+
+  /**
    * Public readonly signal exposing conversational history segments securely.
    */
   readonly chatHistory = this._chatHistory.asReadonly();
@@ -82,6 +89,12 @@ export class ChatState {
   readonly isProgrammaticStreamActive = this._isProgrammaticStreamActive.asReadonly();
 
   readonly latestLlmLog = this._latestLlmLog.asReadonly();
+
+  /**
+   * Public readonly signal exposing the count of component-name heals silently
+   * applied to the current surface. Consumed by the repair badge.
+   */
+  readonly componentNameHealCount = this._componentNameHealCount.asReadonly();
 
   /**
    * Public readonly signal exposing the historical LLM telemetry logs list reactively.
@@ -123,6 +136,16 @@ export class ChatState {
    */
   setProgrammaticStreamActive(active: boolean): void {
     this._isProgrammaticStreamActive.set(active);
+  }
+
+  /**
+   * Records the number of component-name heals applied to the current surface.
+   * Called once per render so a clean render (count 0) clears prior state.
+   *
+   * @param count The number of silently applied component-name heals.
+   */
+  setComponentNameHealCount(count: number): void {
+    this._componentNameHealCount.set(count);
   }
 
   addRawLlmLog(type: LlmLogType, payload: unknown): void {
