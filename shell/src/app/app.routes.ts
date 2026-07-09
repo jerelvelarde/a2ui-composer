@@ -40,6 +40,13 @@ export const routes: Routes = [
         canActivate: [startupGuard],
       },
       {
+        path: 'widget-gallery',
+        loadComponent: () =>
+          import('./gallery/widget-gallery/widget-gallery').then(m => m.WidgetGallery),
+        title: 'A2UI Widget Gallery',
+        canActivate: [startupGuard],
+      },
+      {
         path: 'settings',
         loadComponent: () => import('./settings/settings-view/settings').then(m => m.Settings),
         title: 'A2UI Composer Settings',
