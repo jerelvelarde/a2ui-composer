@@ -1,0 +1,81 @@
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<div class="scenario-player-container">
+  <div class="scenario-panel">
+    <div class="scenario-header">
+      <h2 class="scenario-title">{{ scenario.title }}</h2>
+      <p class="scenario-subtitle">
+        Simulated Theater playback: replays a static scenario over the live apply path.
+      </p>
+    </div>
+
+    <div class="scenario-controls">
+      <button
+        mat-flat-button
+        color="primary"
+        class="control-play"
+        [disabled]="isPlaying()"
+        (click)="play()"
+      >
+        <mat-icon>play_arrow</mat-icon>
+        Play
+      </button>
+      <button mat-stroked-button class="control-pause" [disabled]="!isPlaying()" (click)="pause()">
+        <mat-icon>pause</mat-icon>
+        Pause
+      </button>
+      <button mat-stroked-button class="control-reset" (click)="reset()">
+        <mat-icon>replay</mat-icon>
+        Reset
+      </button>
+      <span class="scenario-status" data-testid="playback-state">{{ playbackState() }}</span>
+      <span class="scenario-progress-count">{{ cursor() }} / {{ totalTicks }}</span>
+    </div>
+
+    <mat-progress-bar
+      class="scenario-progress-bar"
+      mode="determinate"
+      [value]="progress()"
+    ></mat-progress-bar>
+
+    <mat-nav-list class="scenario-timeline">
+      @for (tick of scenario.ticks; track $index) {
+        <div
+          mat-list-item
+          class="timeline-tick"
+          [class.tick-active]="$index === cursor()"
+          [class.tick-emitted]="$index < cursor()"
+        >
+          <span class="tick-index">{{ $index + 1 }}</span>
+          <span class="tick-label">{{ tick.label }}</span>
+          @if ($index < cursor()) {
+            <mat-icon class="tick-check">check_circle</mat-icon>
+          }
+        </div>
+      }
+    </mat-nav-list>
+  </div>
+
+  <mat-card class="scenario-preview-card">
+    <mat-card-header>
+      <mat-card-title>Preview</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <a2ui-composer-rendered-frame></a2ui-composer-rendered-frame>
+    </mat-card-content>
+  </mat-card>
+</div>
