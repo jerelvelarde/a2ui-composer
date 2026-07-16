@@ -34,7 +34,7 @@ test.describe('Renderer Picker User Journey', () => {
     //    handshake to complete (header reflects the discovered catalog id).
     await page.goto('/?renderer=http://localhost:3456');
     await expect(page.locator('.workspace-container')).toBeVisible();
-    await expect(page.locator('.header-title')).toContainText('my_basic_catalog');
+    await expect(page.locator('.header-catalog-chip')).toContainText('my_basic_catalog');
 
     const previewIframe = page.locator('.workspace-container iframe.preview-iframe');
     await expect(previewIframe).toHaveAttribute('src', /localhost:3456/);
@@ -49,7 +49,7 @@ test.describe('Renderer Picker User Journey', () => {
     //    a fresh discovery handshake completes: the header title updates to the
     //    flight catalog id, proving the handshake ran against the new renderer.
     await expect(previewIframe).toHaveAttribute('src', /localhost:3459/);
-    await expect(page.locator('.header-title')).toContainText('Dashboard Catalog');
-    await expect(page.locator('.header-title')).not.toContainText('my_basic_catalog');
+    await expect(page.locator('.header-catalog-chip')).toContainText('Dashboard Catalog');
+    await expect(page.locator('.header-catalog-chip')).not.toContainText('my_basic_catalog');
   });
 });

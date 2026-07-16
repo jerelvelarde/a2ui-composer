@@ -148,13 +148,17 @@ describe('ComposerShell Layout', () => {
     },
   );
 
-  it('dynamically updates the header title when ' + 'activeCatalogTitle mutates', async () => {
+  it('keeps the product title stable and surfaces the catalog as a chip', async () => {
+    expect(await harness.getCatalogChipText()).toBeNull();
     catalogManagementServiceMock.activeCatalogTitle.set('Test Catalog');
     fixture.detectChanges();
-    expect(await harness.getHeaderTitleText()).toBe('A2UI Composer - Test Catalog');
+    // Product title stays stable; the active catalog appears as a chip.
+    expect(await harness.getHeaderTitleText()).toBe('A2UI Composer');
+    expect(await harness.getCatalogChipText()).toBe('Test Catalog');
   });
 
-  it('binds the activeCatalogDescription correctly as a tooltip', async () => {
+  it('binds the activeCatalogDescription as a tooltip on the catalog chip', async () => {
+    catalogManagementServiceMock.activeCatalogTitle.set('Test Catalog');
     catalogManagementServiceMock.activeCatalogDescription.set('Sample description');
     fixture.detectChanges();
     expect(await harness.getHeaderTooltipText()).toBe('Sample description');

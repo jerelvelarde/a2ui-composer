@@ -14,25 +14,44 @@
  * limitations under the License.
  */
 
-.library-sidebar {
+:host {
   display: flex;
   flex-direction: column;
-  // Horizontal insets come from the shared section-label + item padding so
-  // the Library group aligns with the nav items above it.
-  padding: var(--cpk-space-2) 0 var(--cpk-space-4);
-  margin-top: var(--cpk-space-2);
-  border-top: 1px solid var(--cpk-divider);
-}
-.save-draft-button {
-  // Full width minus the left+right margins (2 x space-3 = space-5).
-  width: calc(100% - var(--cpk-space-5));
-  margin: var(--cpk-space-1) var(--cpk-space-3) var(--cpk-space-2);
-}
-.library-empty {
-  margin: var(--cpk-space-1) var(--cpk-space-3) 0;
-  font-size: 0.8125rem;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cpk-space-2);
+  padding: var(--cpk-space-6) var(--cpk-space-4);
+  text-align: center;
   color: var(--cpk-text-secondary);
 }
-.library-list {
-  padding-top: 0;
+
+.cpk-empty__icon {
+  width: 40px;
+  height: 40px;
+  font-size: 40px;
+  color: var(--cpk-text-faint);
+  margin-bottom: var(--cpk-space-2);
+}
+
+.cpk-empty__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--cpk-text-primary);
+}
+
+.cpk-empty__description {
+  margin: 0;
+  max-width: 42ch;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--cpk-text-secondary);
+}
+
+.cpk-empty__action {
+  margin-top: var(--cpk-space-3);
+
+  &:empty {
+    display: none;
+  }
 }

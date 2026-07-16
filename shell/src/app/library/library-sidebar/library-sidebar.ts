@@ -21,6 +21,7 @@ import {WidgetLibrary} from '../../storage/widget-library/widget-library';
 import {WidgetRecord} from '../../storage/models/widget-storage.model';
 import {StateSync} from '../../chat/state-sync/state-sync';
 import {CatalogManagement} from '../../storage/catalog-management/catalog-management';
+import {SectionLabel} from '../../shared/ui/section-label/section-label';
 
 /**
  * Sidebar section that lists the author's persisted widget library and offers a
@@ -32,7 +33,7 @@ import {CatalogManagement} from '../../storage/catalog-management/catalog-manage
 @Component({
   selector: 'a2ui-composer-library-sidebar',
   standalone: true,
-  imports: [MatListModule, MatButtonModule],
+  imports: [MatListModule, MatButtonModule, SectionLabel],
   templateUrl: './library-sidebar.ng.html',
   styleUrl: './library-sidebar.scss',
 })

@@ -26,6 +26,24 @@ if (typeof window !== 'undefined' && (!window.crypto || !window.crypto.subtle)) 
   });
 }
 
+// jsdom does not implement matchMedia, which Angular CDK's BreakpointObserver
+// (used by the responsive shell) relies on. Provide a minimal, inert stub.
+if (typeof window !== 'undefined' && !window.matchMedia) {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    }),
+  });
+}
+
 if (!getTestBed().platform) {
   getTestBed().initTestEnvironment(BrowserTestingModule, platformBrowserTesting());
 }

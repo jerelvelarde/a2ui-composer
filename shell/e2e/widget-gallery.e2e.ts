@@ -42,7 +42,7 @@ test.describe('Widget Gallery User Journey', () => {
     await expect(workspaceIframe).toBeVisible();
 
     // Wait for the catalog handshake to complete (indicated by header title updating).
-    await expect(page.locator('.header-title')).toContainText('my_basic_catalog');
+    await expect(page.locator('.header-catalog-chip')).toContainText('my_basic_catalog');
 
     // 2. Navigate to the widget gallery via the sidebar link.
     const galleryLink = page.getByRole('link', {name: 'Widget Gallery'});
@@ -174,7 +174,7 @@ test.describe('Widget Gallery User Journey', () => {
     //    IndexedDB schema (both stores) before touching the widget store.
     await page.goto('/?renderer=http://localhost:3456');
     await expect(page.locator('.workspace-container')).toBeVisible();
-    await expect(page.locator('.header-title')).toContainText('my_basic_catalog');
+    await expect(page.locator('.header-catalog-chip')).toContainText('my_basic_catalog');
     const galleryLink = page.getByRole('link', {name: 'Widget Gallery'});
     await expect(galleryLink).toBeVisible();
     await galleryLink.click();

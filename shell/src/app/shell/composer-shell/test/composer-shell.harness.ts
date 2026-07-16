@@ -26,16 +26,23 @@ export class ComposerShellHarness extends ComponentHarness {
   static hostSelector = 'a2ui-composer-shell';
 
   private getHeaderTitle = this.locatorFor('.composer-header .header-title');
+  private getCatalogChip = this.locatorForOptional('.header-catalog-chip');
   private getThemeToggleButton = this.locatorFor('button[aria-label*="theme"]');
   private getHamburgerButton = this.locatorFor('button.hamburger-button');
   private getSidenav = this.locatorFor(MatSidenavHarness);
-  private getResetButton = this.locatorFor('button.reset-session-button');
+  private getResetButton = this.locatorFor('.reset-session-button button');
   private getHeaderTooltip = this.locatorFor(MatTooltipHarness);
   private getNavList = this.locatorFor(MatNavListHarness);
 
   async getHeaderTitleText(): Promise<string> {
     const title = await this.getHeaderTitle();
     return title.text();
+  }
+
+  /** Returns the active-catalog chip text, or null when no catalog is active. */
+  async getCatalogChipText(): Promise<string | null> {
+    const chip = await this.getCatalogChip();
+    return chip ? chip.text() : null;
   }
 
   async getHeaderTooltipText(): Promise<string> {

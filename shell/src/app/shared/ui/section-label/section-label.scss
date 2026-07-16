@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-.library-sidebar {
+:host {
   display: flex;
-  flex-direction: column;
-  // Horizontal insets come from the shared section-label + item padding so
-  // the Library group aligns with the nav items above it.
-  padding: var(--cpk-space-2) 0 var(--cpk-space-4);
-  margin-top: var(--cpk-space-2);
-  border-top: 1px solid var(--cpk-divider);
-}
-.save-draft-button {
-  // Full width minus the left+right margins (2 x space-3 = space-5).
-  width: calc(100% - var(--cpk-space-5));
-  margin: var(--cpk-space-1) var(--cpk-space-3) var(--cpk-space-2);
-}
-.library-empty {
-  margin: var(--cpk-space-1) var(--cpk-space-3) 0;
-  font-size: 0.8125rem;
+  align-items: center;
+  gap: var(--cpk-space-2);
+  padding: var(--cpk-space-2) var(--cpk-space-3) var(--cpk-space-1);
+  font-family: var(--cpk-font-body);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--cpk-text-secondary);
-}
-.library-list {
-  padding-top: 0;
+
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--cpk-divider);
+  }
 }

@@ -36,7 +36,7 @@ test.describe('Widget Library Sidebar User Journey', () => {
     //    completes and StateSync seeds a non-empty active draft.
     await page.goto('/?renderer=http://localhost:3456');
     await expect(page.locator('.workspace-container')).toBeVisible();
-    await expect(page.locator('.header-title')).toContainText('my_basic_catalog');
+    await expect(page.locator('.header-catalog-chip')).toContainText('my_basic_catalog');
 
     // 2. The library section is present and starts empty for a fresh session.
     const sidebar = page.locator('a2ui-composer-library-sidebar');

@@ -92,23 +92,64 @@
   position: relative;
   z-index: 2;
   flex-shrink: 0;
-  background: var(--cpk-glass-bg, rgba(255, 255, 255, 0.5));
-  color: var(--cpk-text-primary, #010507);
-  border-bottom: 1px solid var(--cpk-divider, #dbdbe5);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: var(--cpk-space-2);
+  height: auto;
+  min-height: 64px;
+  padding: var(--cpk-space-2) var(--cpk-space-4);
+  background: var(--cpk-glass-bg);
+  color: var(--cpk-text-primary);
+  border-bottom: 1px solid var(--cpk-divider);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   --mat-toolbar-container-background-color: transparent;
-  --mat-toolbar-container-text-color: var(--cpk-text-primary, #010507);
+  --mat-toolbar-container-text-color: var(--cpk-text-primary);
+}
+
+// Brand cluster: product title + catalog chip. Truncates before crowding.
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--cpk-space-2);
+  min-width: 0;
 }
 
 .header-title {
-  font-weight: 300;
+  font-weight: 500;
   font-size: 18px;
-  color: var(--cpk-text-primary, #010507);
+  white-space: nowrap;
+  color: var(--cpk-text-primary);
+}
+
+.header-catalog-chip {
+  min-width: 0;
 }
 
 .spacer {
   flex: 1 1 auto;
+}
+
+// Action cluster: renderer picker + New Session + theme toggle.
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--cpk-space-2);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+// Compact the renderer picker and stop its floating outline label from
+// overflowing above the toolbar (align it inside a fixed comfortable row).
+.header-renderer-picker {
+  --mat-form-field-container-height: 40px;
+  --mat-form-field-container-vertical-padding: 8px;
+
+  ::ng-deep .renderer-picker-field {
+    width: 176px;
+    max-width: 46vw;
+  }
 }
 
 .composer-sidenav-container {
@@ -122,20 +163,20 @@
   ::ng-deep .mat-drawer-container,
   &.mat-drawer-container {
     background-color: transparent;
-    color: var(--cpk-text-primary, #010507);
+    color: var(--cpk-text-primary);
   }
 }
 
 .composer-sidenav {
   width: 250px;
   box-sizing: border-box;
-  margin: 12px;
+  margin: var(--cpk-space-3);
   height: calc(100% - 24px);
-  padding: 12px 8px;
-  background: var(--cpk-glass-bg, rgba(255, 255, 255, 0.5));
-  border: 2px solid var(--cpk-glass-border, #ffffff);
-  border-radius: var(--cpk-radius-card, 8px);
-  box-shadow: var(--cpk-shadow-card, 0px 6px 6px -2px rgba(1, 5, 7, 0.08));
+  padding: var(--cpk-space-3) var(--cpk-space-2);
+  background: var(--cpk-glass-bg);
+  border: 2px solid var(--cpk-glass-border);
+  border-radius: var(--cpk-radius-card);
+  box-shadow: var(--cpk-shadow-card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   --mat-sidenav-container-shape: 8px;
@@ -143,32 +184,32 @@
 
   ::ng-deep .mat-drawer-inner-container {
     background: transparent;
-    border-radius: var(--cpk-radius-card, 8px);
+    border-radius: var(--cpk-radius-card);
     overflow: visible;
   }
 
   ::ng-deep .mat-mdc-nav-list {
-    padding-top: 4px;
+    padding-top: var(--cpk-space-1);
   }
 
-  // Nav items: 8px 12px padding, 4px radius, transparent default.
+  // Nav items: consistent padding, radius, transparent default.
   ::ng-deep .mat-mdc-list-item {
     min-height: 40px;
-    padding: 8px 12px;
+    padding: var(--cpk-space-2) var(--cpk-space-3);
     margin: 2px 0;
-    border-radius: var(--cpk-radius-item, 4px);
+    border-radius: var(--cpk-radius-item);
     background: transparent;
     transition: background-color 0.15s ease;
 
     .mdc-list-item__content,
     .mat-mdc-list-item-unscoped-content {
-      color: var(--cpk-text-primary, #010507);
+      color: var(--cpk-text-primary);
       font-size: 14px;
       font-weight: 500;
     }
 
     &:hover {
-      background: var(--cpk-glass-bg-hover, rgba(255, 255, 255, 0.5));
+      background: var(--cpk-glass-bg-hover);
     }
 
     // Remove Material's default hover/focus overlay so our glass wash shows.
@@ -178,41 +219,59 @@
     }
 
     &.nav-item-active {
-      background: var(--cpk-glass-bg-selected, rgba(255, 255, 255, 0.7));
+      background: var(--cpk-glass-bg-selected);
     }
   }
 }
 
-.nav-section-label {
+// The drawer content scrolls as one column; groups stack top to bottom.
+.composer-nav {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px 4px;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--cpk-text-secondary, #57575b);
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 
-  &::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--cpk-divider, #dbdbe5);
-  }
+.composer-nav-settings {
+  margin-top: auto;
 }
 
 .composer-content {
   padding: 0;
   box-sizing: border-box;
   height: 100%;
+  min-width: 0;
+  overflow: hidden;
   background: transparent;
 }
 
 .hamburger-button {
-  margin-right: 8px;
+  margin-right: var(--cpk-space-2);
 }
 
 .theme-toggle-button {
-  margin-left: 8px;
+  margin-left: var(--cpk-space-1);
+  --mat-icon-button-icon-color: var(--cpk-text-primary);
+}
+
+// --- Responsive: narrow / mobile layout --------------------------------
+@media (max-width: 768px) {
+  .composer-sidenav {
+    width: 82vw;
+    max-width: 300px;
+    margin: 0;
+    height: 100%;
+    border-radius: 0;
+    border-width: 0 1px 0 0;
+  }
+
+  .header-actions {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+  }
+
+  .header-renderer-picker ::ng-deep .renderer-picker-field {
+    max-width: 60vw;
+  }
 }

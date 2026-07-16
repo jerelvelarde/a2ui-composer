@@ -15,8 +15,11 @@
  */
 
 import {Component, computed, effect, inject} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {BreakpointObserver} from '@angular/cdk/layout';
+import {map} from 'rxjs';
 import {MatToolbarModule} from '@angular/material/toolbar';
-import {MatSidenavModule} from '@angular/material/sidenav';
+import {MatSidenav, MatSidenavModule} from '@angular/material/sidenav';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatListModule} from '@angular/material/list';
@@ -31,11 +34,19 @@ import {LocalStorageKey} from '../../storage/models/local-storage-keys';
 import {LocalStorageInteractions} from '../../storage/local-storage-interactions/local-storage-interactions';
 import {SessionStorageInteractions} from '../../storage/session-storage-interactions/session-storage-interactions';
 import {LibrarySidebar} from '../../library/library-sidebar/library-sidebar';
+import {Badge} from '../../shared/ui/badge/badge';
+import {Button} from '../../shared/ui/button/button';
+import {SectionLabel} from '../../shared/ui/section-label/section-label';
+
+/** Viewport width (px) at/below which the shell collapses to a mobile layout. */
+const NARROW_BREAKPOINT = '(max-width: 768px)';
 
 /**
  * The primary layout container for the A2UI Composer.
- * Renders the permanent header bar, persistent navigation sidebar,
- * and hosts the active workspace routing outlet.
+ * Renders the responsive header bar, collapsible grouped navigation
+ * sidebar, and hosts the active workspace routing outlet. Below
+ * {@link NARROW_BREAKPOINT} the nav collapses into an overlay drawer
+ * toggled by the header hamburger.
  */
 @Component({
   selector: 'a2ui-composer-shell',
@@ -52,6 +63,9 @@ import {LibrarySidebar} from '../../library/library-sidebar/library-sidebar';
     MatTooltipModule,
     RendererPicker,
     LibrarySidebar,
+    Badge,
+    Button,
+    SectionLabel,
   ],
   templateUrl: './composer-shell.ng.html',
   styleUrl: './composer-shell.scss',
@@ -59,6 +73,14 @@ import {LibrarySidebar} from '../../library/library-sidebar/library-sidebar';
 export class ComposerShell {
   isDarkTheme = computed(() => this.configProvider.themePreference() === 'dark');
   private readonly catalogManagement = inject(CatalogManagement);
+  private readonly breakpointObserver = inject(BreakpointObserver);
+
+  /** True when the viewport is narrow enough to collapse the nav to an overlay. */
+  isNarrow = toSignal(
+    this.breakpointObserver.observe(NARROW_BREAKPOINT).pipe(map(result => result.matches)),
+    {initialValue: false},
+  );
+
   private readonly indexedDbStorage = inject(IndexedDbStorage);
   private readonly storage = inject(LocalStorageInteractions);
   private readonly sessionStorage = inject(SessionStorageInteractions);
@@ -98,5 +120,15 @@ export class ComposerShell {
       this.document.defaultView.location.reload();
     }
     console.log('Session state cleared.');
+  }
+
+  /**
+   * Dismisses the overlay drawer after navigation on narrow viewports so the
+   * selected route content is visible; a no-op when the nav is docked.
+   */
+  closeOnNarrow(sidenav: MatSidenav): void {
+    if (this.isNarrow()) {
+      void sidenav.close();
+    }
   }
 }

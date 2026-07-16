@@ -36,7 +36,7 @@ test.describe('Scenario Player Simulated Playback', () => {
     //    frame is connected and the catalog handshake completes.
     await page.goto('/?renderer=http://localhost:3456');
     await expect(page.locator('.workspace-container')).toBeVisible();
-    await expect(page.locator('.header-title')).toContainText('my_basic_catalog');
+    await expect(page.locator('.header-catalog-chip')).toContainText('my_basic_catalog');
 
     // 2. Navigate to the Scenario Player view.
     const playerLink = page.getByRole('link', {name: 'Scenario Player'});

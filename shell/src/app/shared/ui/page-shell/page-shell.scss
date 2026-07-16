@@ -1,0 +1,76 @@
+/**
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  color: var(--cpk-text-primary);
+}
+
+.cpk-page__header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cpk-space-4);
+  flex-wrap: wrap;
+  padding: var(--cpk-space-5) var(--cpk-space-5) var(--cpk-space-3);
+}
+
+.cpk-page__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--cpk-text-primary);
+}
+
+.cpk-page__description {
+  margin: var(--cpk-space-1) 0 0;
+  font-size: 14px;
+  color: var(--cpk-text-secondary);
+}
+
+.cpk-page__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--cpk-space-2);
+  flex-wrap: wrap;
+
+  &:empty {
+    display: none;
+  }
+}
+
+.cpk-page__body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--cpk-space-3) var(--cpk-space-5) var(--cpk-space-5);
+  box-sizing: border-box;
+
+  // Centred content column by default; opt out with `fluid`.
+  > * {
+    max-width: 1200px;
+    margin-inline: auto;
+  }
+}
+
+.cpk-page__body--fluid > * {
+  max-width: none;
+  margin-inline: 0;
+}

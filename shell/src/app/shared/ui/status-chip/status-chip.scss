@@ -1,0 +1,60 @@
+/**
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cpk-space-2);
+  padding: 2px var(--cpk-space-2) 2px var(--cpk-space-2);
+  border-radius: var(--cpk-radius-pill);
+  font-family: var(--cpk-font-body);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+
+  // Defaults (info); overridden per status below.
+  background: var(--cpk-accent-bg);
+  color: var(--cpk-accent);
+}
+
+.cpk-status-chip__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+:host([data-status='success']) {
+  background: var(--cpk-success-bg);
+  color: var(--cpk-success);
+}
+
+:host([data-status='warning']) {
+  background: var(--cpk-warning-bg);
+  color: var(--cpk-warning);
+}
+
+:host([data-status='critical']) {
+  background: var(--cpk-critical-bg);
+  color: var(--cpk-critical);
+}
+
+:host([data-status='info']) {
+  background: var(--cpk-accent-bg);
+  color: var(--cpk-accent);
+}
