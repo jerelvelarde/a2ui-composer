@@ -29,9 +29,9 @@
   margin: var(--cpk-space-1) var(--cpk-space-3) var(--cpk-space-2);
 }
 .library-empty {
-  margin: var(--cpk-space-1) var(--cpk-space-3) 0;
-  font-size: 0.8125rem;
-  color: var(--cpk-text-secondary);
+  // Trim the shared empty-state's outer spacing for this narrow sidebar
+  // context; the full centred treatment is meant for full-width route bodies.
+  margin: 0 var(--cpk-space-2);
 }
 .library-list {
   padding-top: 0;

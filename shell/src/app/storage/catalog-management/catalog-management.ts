@@ -23,7 +23,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Catalog} from '../models/catalog-storage.model';
 import {from, of} from 'rxjs';
 import {concatMap} from 'rxjs/operators';
-import {sanitizeHtml} from 'safevalues';
+import {sanitizeHtmlToFragment} from 'safevalues';
 import {IndexedDbStorage} from '../indexed-db-storage/indexed-db-storage';
 import {StartupResolution} from '../../shell/startup-resolution/startup-resolution';
 import {PreviewBridgeMessageType} from 'a2ui-bridge';
@@ -220,10 +220,10 @@ export class CatalogManagement {
             try {
               catalogObj = structuredClone(payload as Catalog);
               if (typeof catalogObj['title'] === 'string') {
-                catalogObj['title'] = sanitizeHtml(catalogObj['title']).toString();
+                catalogObj['title'] = toDisplayText(catalogObj['title']);
               }
               if (typeof catalogObj['description'] === 'string') {
-                catalogObj['description'] = sanitizeHtml(catalogObj['description']).toString();
+                catalogObj['description'] = toDisplayText(catalogObj['description']);
               }
               catalogString = stableStringify(catalogObj);
             } catch (err: unknown) {
@@ -353,6 +353,19 @@ export class CatalogManagement {
       }
     }, CatalogManagement.DISCOVERY_WATCHDOG_MS);
   }
+}
+
+/**
+ * Reduces an untrusted catalog string to safe, display-ready plain text.
+ * The value is first run through the HTML sanitizer (defence in depth,
+ * stripping scripts and event handlers) and then flattened to its text
+ * content. The title and description are only ever surfaced through Angular
+ * text interpolation and Material tooltips, both of which escape on output;
+ * storing decoded plain text here avoids the double HTML-escaping that
+ * previously rendered a literal `&amp;amp;` in place of a plain `&`.
+ */
+function toDisplayText(value: string): string {
+  return sanitizeHtmlToFragment(value).textContent ?? '';
 }
 
 function simpleHash(str: string): string {

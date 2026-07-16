@@ -71,6 +71,11 @@
       }
     </div>
   } @else {
-    <p class="empty-state">No icons match &ldquo;{{ query() }}&rdquo;.</p>
+    <a2ui-composer-empty-state
+      class="icon-empty"
+      icon="search_off"
+      title="No matching icons"
+      [description]="'No icons match “' + query() + '”. Try a different search term.'"
+    ></a2ui-composer-empty-state>
   }
 </div>

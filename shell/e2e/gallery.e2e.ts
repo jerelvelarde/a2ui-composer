@@ -56,8 +56,10 @@ test.describe('Components Gallery User Journey', () => {
 
     // 3. Redirected to /gallery and layout loads successfully
     await page.waitForURL('**/gallery');
-    await expect(page.locator('.gallery-container')).toBeVisible();
-    await expect(page.getByRole('heading', {name: 'No Component Selected'})).toBeVisible();
+    await expect(page.locator('.gallery-layout')).toBeVisible();
+    // With a catalog loaded, the gallery preselects the first component rather
+    // than resting on the "No Component Selected" empty state.
+    await expect(page.locator('.component-title')).toBeVisible();
 
     // 4. Verify component catalog navigation is visible
     const navItems = page.locator('.catalog-list').getByRole('button');

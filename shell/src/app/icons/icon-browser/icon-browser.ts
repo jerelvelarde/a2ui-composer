@@ -20,6 +20,7 @@ import {MatInputModule} from '@angular/material/input';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {MATERIAL_ICON_NAMES, iconSnippet} from './icon-catalog';
+import {EmptyState} from '../../shared/ui/empty-state/empty-state';
 
 /**
  * Read-only icon browser. Renders the curated Material Icons set as a
@@ -30,7 +31,7 @@ import {MATERIAL_ICON_NAMES, iconSnippet} from './icon-catalog';
 @Component({
   selector: 'a2ui-composer-icon-browser',
   standalone: true,
-  imports: [MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule],
+  imports: [MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, EmptyState],
   templateUrl: './icon-browser.ng.html',
   styleUrl: './icon-browser.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

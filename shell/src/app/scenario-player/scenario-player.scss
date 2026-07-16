@@ -22,6 +22,30 @@
   box-sizing: border-box;
 }
 
+/*
+ * Below the shell's narrow breakpoint the timeline panel and preview can no
+ * longer share a row without the fixed 360px panel forcing horizontal
+ * overflow, so they stack into a single scrollable column.
+ */
+@media (max-width: 768px) {
+  .scenario-player-container {
+    flex-direction: column;
+    height: auto;
+    min-height: 100%;
+    overflow-y: auto;
+  }
+
+  .scenario-panel {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .scenario-preview-card {
+    flex: 0 0 auto;
+    min-height: 360px;
+  }
+}
+
 .scenario-panel {
   display: flex;
   flex-direction: column;

@@ -23,11 +23,20 @@ import {BASIC_CATALOG_SCENARIO} from './scenarios/basic-catalog-scenario';
 import {HostCommunication} from '../shell/host-communication/host-communication';
 import {StartupResolution} from '../shell/startup-resolution/startup-resolution';
 import {ChatState} from '../chat/chat-state/chat-state';
+import {CatalogManagement} from '../storage/catalog-management/catalog-management';
+import {Catalog} from '../storage/models/catalog-storage.model';
 
 class MockHostCommunication {
   sendRenderA2UI = vi.fn();
   registerIframeElement = vi.fn();
   registerIframe = vi.fn();
+}
+
+/** Minimal CatalogManagement stand-in for the embedded rendered-frame preview. */
+class MockCatalogManagement {
+  readonly activeCatalog = signal<Catalog | null>({catalogId: 'scenario'} as Catalog);
+  readonly catalogError = signal<string | null>(null);
+  prepareForRendererSwitch = vi.fn();
 }
 
 class MockStartupResolution {
@@ -58,6 +67,7 @@ describe('ScenarioPlayer', () => {
         {provide: HostCommunication, useClass: MockHostCommunication},
         {provide: StartupResolution, useClass: MockStartupResolution},
         {provide: ChatState, useClass: MockChatState},
+        {provide: CatalogManagement, useClass: MockCatalogManagement},
       ],
     }).compileComponents();
 

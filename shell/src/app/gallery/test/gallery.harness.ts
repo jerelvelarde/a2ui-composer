@@ -36,7 +36,9 @@ export class GalleryHarness extends ComponentHarness {
   private readonly getCopyButton = this.locatorForOptional(
     MatButtonHarness.with({selector: '.copy-button'}),
   );
-  private readonly getEmptySubtitle = this.locatorForOptional('.empty-subtitle');
+  private readonly getEmptySubtitle = this.locatorForOptional(
+    'a2ui-composer-empty-state .cpk-empty__description',
+  );
   private readonly getCardTitles = this.locatorForAll('mat-card-title');
   private readonly getRenderedFrame = this.locatorForOptional(RenderedFrameHarness);
 

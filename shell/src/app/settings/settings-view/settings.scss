@@ -75,6 +75,19 @@
     font-family: monospace;
     font-size: 12px;
     line-height: 1.5;
+    // Long diagnostic strings / URLs must wrap rather than force the card to
+    // scroll horizontally on narrow viewports.
+    overflow-wrap: anywhere;
+
+    code {
+      display: block;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .settings-container {
+    padding: 16px;
   }
 }
 

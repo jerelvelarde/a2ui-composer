@@ -14,8 +14,8 @@
  limitations under the License.
 -->
 
-<mat-sidenav-container class="gallery-container">
-  <mat-sidenav mode="side" opened class="gallery-sidenav">
+<div class="gallery-layout">
+  <aside class="gallery-catalog" aria-label="Component catalog">
     <mat-nav-list class="catalog-list">
       @for (group of componentsList(); track group.category) {
         <div mat-subheader class="category-header">{{ group.category }}</div>
@@ -31,9 +31,9 @@
         }
       }
     </mat-nav-list>
-  </mat-sidenav>
+  </aside>
 
-  <mat-sidenav-content class="gallery-content">
+  <section class="gallery-content">
     <div [class.hidden-frame]="!selectedComponentKey()">
       <mat-card class="preview-card">
         <mat-card-header>
@@ -141,22 +141,19 @@
         </mat-card>
       </div>
     } @else if (catalogManagement.catalogError()) {
-      <div class="empty-state error-state">
-        <mat-icon class="empty-icon text-danger">error_outline</mat-icon>
-        <h3 class="empty-title">Catalog Configuration Required</h3>
-        <p class="empty-subtitle">
-          {{ catalogManagement.catalogError() }}
-        </p>
-      </div>
+      <a2ui-composer-empty-state
+        class="gallery-empty"
+        icon="error_outline"
+        title="Catalog Configuration Required"
+        [description]="catalogManagement.catalogError() || ''"
+      ></a2ui-composer-empty-state>
     } @else {
-      <div class="empty-state">
-        <mat-icon class="empty-icon">analytics</mat-icon>
-        <h3 class="empty-title">No Component Selected</h3>
-        <p class="empty-subtitle">
-          Choose a component from the sidebar catalog to view its schema details, presets, and usage
-          snippet.
-        </p>
-      </div>
+      <a2ui-composer-empty-state
+        class="gallery-empty"
+        icon="analytics"
+        title="No Component Selected"
+        description="Choose a component from the sidebar catalog to view its schema details, presets, and usage snippet."
+      ></a2ui-composer-empty-state>
     }
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  </section>
+</div>

@@ -36,4 +36,24 @@ export class RenderedFrameHarness extends ComponentHarness {
     const container = await this.locatorFor('.rendered-frame-container')();
     return await container.hasClass('is-locked');
   }
+
+  private getErrorPanel = this.locatorForOptional('.rendered-frame-error');
+  private getLoadingOverlay = this.locatorForOptional('.rendered-frame-loading');
+  private getRetryButton = this.locatorForOptional('.rendered-frame-error a2ui-composer-button');
+
+  async hasError(): Promise<boolean> {
+    return !!(await this.getErrorPanel());
+  }
+
+  async isLoading(): Promise<boolean> {
+    return !!(await this.getLoadingOverlay());
+  }
+
+  async clickRetry(): Promise<void> {
+    const button = await this.getRetryButton();
+    if (!button) {
+      throw new Error('Retry button is not present in the current state.');
+    }
+    await button.click();
+  }
 }

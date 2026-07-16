@@ -26,7 +26,7 @@ export class IconBrowserHarness extends ComponentHarness {
 
   private readonly getCards = this.locatorForAll('.icon-card');
   private readonly getFilterInput = this.locatorFor(MatInputHarness);
-  private readonly getEmptyState = this.locatorForOptional('.empty-state');
+  private readonly getEmptyState = this.locatorForOptional('a2ui-composer-empty-state');
   private readonly getSelectedName = this.locatorForOptional('.selected-name');
   private readonly getSelectedSnippet = this.locatorForOptional('.selected-snippet');
   private readonly getCopyButton = this.locatorForOptional('.copy-snippet-button');

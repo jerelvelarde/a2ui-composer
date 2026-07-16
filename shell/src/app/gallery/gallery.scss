@@ -19,13 +19,20 @@
   height: 100%;
 }
 
-.gallery-container {
+.gallery-layout {
+  display: flex;
+  flex-direction: row;
   height: 100%;
   width: 100%;
+  min-height: 0;
+  box-sizing: border-box;
 }
 
-.gallery-sidenav {
+.gallery-catalog {
+  flex: 0 0 240px;
   width: 240px;
+  min-width: 0;
+  overflow-y: auto;
   border-right: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
   background-color: var(--mat-sys-surface-container-low, #fcfcfc);
 }
@@ -37,7 +44,7 @@
   color: var(--mat-sys-on-surface, #1c1b1f);
 }
 
-.gallery-sidenav .catalog-list {
+.gallery-catalog .catalog-list {
   .category-header {
     font: var(--mat-sys-typescale-label-medium);
     font-weight: 600;
@@ -87,42 +94,43 @@
 }
 
 .gallery-content {
+  flex: 1 1 auto;
   box-sizing: border-box;
   height: 100%;
+  min-width: 0;
   padding: 24px;
   background-color: var(--mat-sys-background, #fafafa);
   overflow-y: auto;
 }
 
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 80%;
-  text-align: center;
-  color: var(--mat-sys-on-surface-variant, #666);
+.gallery-empty {
+  min-height: 60%;
 }
 
-.empty-icon {
-  font-size: 48px;
-  height: 48px;
-  width: 48px;
-  margin-bottom: 16px;
-  opacity: 0.5;
-}
+/*
+ * On narrow viewports the catalog can no longer sit beside the detail pane as a
+ * fixed column, so the layout stacks: the catalog becomes a capped, scrollable
+ * strip above the scrollable content. This keeps both regions reachable with no
+ * horizontal overflow and removes the clipped/overlapping floating column.
+ */
+@media (max-width: 768px) {
+  .gallery-layout {
+    flex-direction: column;
+  }
 
-.empty-title {
-  margin: 0 0 8px 0;
-  font-size: 1.25rem;
-  font-weight: 500;
-}
+  .gallery-catalog {
+    flex: 0 0 auto;
+    width: 100%;
+    max-height: 38vh;
+    border-right: none;
+    border-bottom: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
+  }
 
-.empty-subtitle {
-  margin: 0;
-  max-width: 400px;
-  font-size: 0.9rem;
-  opacity: 0.8;
+  .gallery-content {
+    height: auto;
+    flex: 1 1 auto;
+    padding: 16px;
+  }
 }
 
 .details-panel {

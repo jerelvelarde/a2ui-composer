@@ -22,9 +22,9 @@ import {
   inject,
   OnInit,
   OnDestroy,
+  untracked,
 } from '@angular/core';
 import {JsonPipe} from '@angular/common';
-import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatListModule} from '@angular/material/list';
 import {MatCardModule} from '@angular/material/card';
 import {MatTableModule} from '@angular/material/table';
@@ -35,6 +35,7 @@ import {GalleryCatalog} from './services/gallery-catalog';
 import {CatalogManagement} from '../storage/catalog-management/catalog-management';
 import {RenderedFrame} from '../preview/rendered/rendered-frame';
 import {HostCommunication} from '../shell/host-communication/host-communication';
+import {EmptyState} from '../shared/ui/empty-state/empty-state';
 
 /**
  * Displays a split visual catalog gallery enabling search, interactive component selection,
@@ -45,7 +46,6 @@ import {HostCommunication} from '../shell/host-communication/host-communication'
   standalone: true,
   imports: [
     JsonPipe,
-    MatSidenavModule,
     MatListModule,
     MatCardModule,
     MatTableModule,
@@ -53,6 +53,7 @@ import {HostCommunication} from '../shell/host-communication/host-communication'
     MatIconModule,
     MatProgressSpinnerModule,
     RenderedFrame,
+    EmptyState,
   ],
   templateUrl: './gallery.ng.html',
   styleUrl: './gallery.scss',
@@ -110,6 +111,18 @@ export class Gallery implements OnInit, OnDestroy {
         this.hostCommunication.sendRenderA2UI(payload);
       } catch (e) {
         console.error('Failed to parse component usage JSON:', e);
+      }
+    });
+
+    // Preselect the first component once a catalog resolves so the gallery opens
+    // on a populated detail view rather than a dead "nothing selected" screen.
+    // Guarded on an empty selection so a user's later deselection is respected.
+    effect(() => {
+      const groups = this.componentsList();
+      if (untracked(() => this.selectedComponentKey())) return;
+      const firstComponent = groups.find(g => g.components.length > 0)?.components[0];
+      if (firstComponent) {
+        untracked(() => this.selectComponent(firstComponent));
       }
     });
   }

@@ -343,7 +343,7 @@ describe('CatalogManagement', () => {
     expect(service.lastCatalogString()).not.toContain('onerror');
 
     expect(service.activeCatalogTitle()).toBe('Catalog Title ');
-    expect(service.activeCatalogDescription()).toBe('Catalog Description <img src="x" />');
+    expect(service.activeCatalogDescription()).toBe('Catalog Description ');
 
     const expectedHash = service.lastChecksumHash();
     expect(expectedHash).toBeTruthy();
@@ -637,8 +637,8 @@ describe('CatalogManagement', () => {
 
     await vi.advanceTimersByTimeAsync(0);
 
-    expect(service.activeCatalogTitle()).toBe('Test Title <b>Bold</b>');
-    expect(service.activeCatalogDescription()).toBe('Test Description <i>Italic</i>');
+    expect(service.activeCatalogTitle()).toBe('Test Title Bold');
+    expect(service.activeCatalogDescription()).toBe('Test Description Italic');
     expect(service.activeCatalog()?.['catalogId']).toBe('custom-catalog-id');
   });
 

@@ -14,15 +14,46 @@
  limitations under the License.
 -->
 <div class="rendered-frame-container" [class.is-locked]="isLocked()">
-  @if (safeRendererUrl()) {
-    <iframe
-      #previewIframe
-      [src]="safeRendererUrl()"
-      sandbox="allow-scripts allow-same-origin allow-forms"
-      class="preview-iframe"
-      title="Rendered Preview"
-    ></iframe>
-  } @else {
-    <div class="rendered-frame-placeholder">Rendered UI Placeholder</div>
+  @switch (loadState()) {
+    @case ('empty') {
+      <a2ui-composer-empty-state
+        class="rendered-frame-empty"
+        icon="dashboard_customize"
+        title="No renderer configured"
+        description="Set a renderer URL in Settings to preview A2UI output here."
+      ></a2ui-composer-empty-state>
+    }
+    @case ('error') {
+      <div class="rendered-frame-error" role="alert">
+        <a2ui-composer-status-chip status="critical"
+          >Renderer unavailable</a2ui-composer-status-chip
+        >
+        <a2ui-composer-empty-state
+          icon="error_outline"
+          title="Preview failed to load"
+          [description]="errorMessage()"
+        >
+          <a2ui-composer-button slot="action" variant="primary" (click)="retry()"
+            >Retry</a2ui-composer-button
+          >
+        </a2ui-composer-empty-state>
+      </div>
+    }
+    @default {
+      <iframe
+        #previewIframe
+        [src]="safeRendererUrl()"
+        (error)="onIframeError()"
+        sandbox="allow-scripts allow-same-origin allow-forms"
+        class="preview-iframe"
+        title="Rendered Preview"
+      ></iframe>
+      @if (loadState() === 'loading') {
+        <div class="rendered-frame-loading" aria-live="polite">
+          <mat-progress-spinner mode="indeterminate" diameter="36"></mat-progress-spinner>
+          <span class="rendered-frame-loading__label">Loading renderer&hellip;</span>
+        </div>
+      }
+    }
   }
 </div>

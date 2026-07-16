@@ -27,7 +27,11 @@
   </button>
 
   @if (widgets().length === 0) {
-    <p class="library-empty">No saved widgets yet.</p>
+    <a2ui-composer-empty-state
+      class="library-empty"
+      title="No saved widgets yet"
+      description="Save the current draft to start building your widget library."
+    ></a2ui-composer-empty-state>
   } @else {
     <mat-list class="library-list">
       @for (widget of widgets(); track widget.id) {

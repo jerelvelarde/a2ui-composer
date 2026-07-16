@@ -72,7 +72,7 @@ test.describe('Workspace Navigation & Layout Modes', () => {
   }, testInfo) => {
     await page.goto('/gallery');
 
-    const galleryContainer = page.locator('.gallery-container');
+    const galleryContainer = page.locator('.gallery-layout');
     await expect(galleryContainer).toBeVisible();
     await expect(page.getByRole('heading', {name: 'No Component Selected'})).toBeVisible();
     const screenshotBuffer = await page.screenshot();

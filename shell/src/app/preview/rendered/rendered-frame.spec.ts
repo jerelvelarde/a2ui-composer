@@ -22,6 +22,8 @@ import {describe, it, expect, beforeEach, vi} from 'vitest';
 import {StartupResolution} from '../../shell/startup-resolution/startup-resolution';
 import {HostCommunication} from '../../shell/host-communication/host-communication';
 import {ChatState, LlmLogEntry, LlmLogType} from '../../chat/chat-state/chat-state';
+import {CatalogManagement} from '../../storage/catalog-management/catalog-management';
+import {Catalog} from '../../storage/models/catalog-storage.model';
 import {signal, WritableSignal} from '@angular/core';
 
 class MockChatState {
@@ -39,6 +41,18 @@ class MockChatState {
   }
 }
 
+/** Minimal CatalogManagement stand-in exposing only the load-lifecycle signals. */
+class MockCatalogManagement {
+  readonly activeCatalog = signal<Catalog | null>(null);
+  readonly catalogError = signal<string | null>(null);
+  readonly watchdogFired = signal<boolean>(false);
+  readonly isHandshakeInProgress = signal<boolean>(false);
+  prepareForRendererSwitch = vi.fn(() => {
+    this.catalogError.set(null);
+    this.activeCatalog.set(null);
+  });
+}
+
 describe('RenderedFrame Live Preview Viewport', () => {
   let fixture: ComponentFixture<RenderedFrame>;
   let harness: RenderedFrameHarness;
@@ -46,6 +60,7 @@ describe('RenderedFrame Live Preview Viewport', () => {
   let hostCommunicationServiceMock: Partial<HostCommunication>;
   let resolvedUrlSignal: WritableSignal<string | null>;
   let chatStateMock: MockChatState;
+  let catalogManagementMock: MockCatalogManagement;
 
   beforeEach(async () => {
     resolvedUrlSignal = signal('http://localhost:3000/renderer');
@@ -56,6 +71,8 @@ describe('RenderedFrame Live Preview Viewport', () => {
     hostCommunicationServiceMock = {
       registerIframe: vi.fn(),
     };
+
+    catalogManagementMock = new MockCatalogManagement();
 
     await TestBed.configureTestingModule({
       imports: [RenderedFrame],
@@ -71,6 +88,10 @@ describe('RenderedFrame Live Preview Viewport', () => {
         {
           provide: ChatState,
           useClass: MockChatState,
+        },
+        {
+          provide: CatalogManagement,
+          useValue: catalogManagementMock,
         },
       ],
     }).compileComponents();
@@ -132,6 +153,43 @@ describe('RenderedFrame Live Preview Viewport', () => {
     expect(await relativeHarness.getIframeSrc()).toBe(
       'http://localhost:3000/renderer?origin=http%3A%2F%2Flocalhost%3A3000',
     );
+  });
+
+  it('shows a loading overlay over the iframe while the handshake is pending', async () => {
+    expect(await harness.hasIframe()).toBe(true);
+    expect(await harness.isLoading()).toBe(true);
+    expect(await harness.hasError()).toBe(false);
+  });
+
+  it('clears the loading overlay once a catalog handshake resolves', async () => {
+    catalogManagementMock.activeCatalog.set({catalogId: 'c1'} as Catalog);
+    fixture.detectChanges();
+
+    expect(await harness.isLoading()).toBe(false);
+    expect(await harness.hasError()).toBe(false);
+    expect(await harness.hasIframe()).toBe(true);
+  });
+
+  it('surfaces an error state with a retry action when the catalog handshake fails', async () => {
+    catalogManagementMock.catalogError.set('Watchdog timeout: A2UI_CATALOG not received.');
+    fixture.detectChanges();
+
+    expect(await harness.hasError()).toBe(true);
+    expect(await harness.hasIframe()).toBe(false);
+  });
+
+  it('re-attempts discovery and remounts the iframe when retry is pressed', async () => {
+    catalogManagementMock.catalogError.set('Renderer discovery timeout.');
+    fixture.detectChanges();
+    expect(await harness.hasError()).toBe(true);
+
+    await harness.clickRetry();
+    fixture.detectChanges();
+
+    expect(catalogManagementMock.prepareForRendererSwitch).toHaveBeenCalled();
+    expect(await harness.hasError()).toBe(false);
+    expect(await harness.hasIframe()).toBe(true);
+    expect(await harness.isLoading()).toBe(true);
   });
 
   it('visually locks manual preview visual click dispatches during active model stream turns', async () => {
