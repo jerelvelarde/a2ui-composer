@@ -45,7 +45,7 @@
   height: 446px;
   left: 1040px;
   top: 11px;
-  background: rgba(255, 172, 77, 0.2);
+  background: var(--cpk-blur-warm);
 }
 
 .blur-circle--2 {
@@ -53,7 +53,7 @@
   height: 609px;
   left: 1339px;
   top: 625px;
-  background: #c9c9da;
+  background: var(--cpk-blur-cool);
 }
 
 .blur-circle--3 {
@@ -61,7 +61,7 @@
   height: 609px;
   left: 670px;
   top: -365px;
-  background: #c9c9da;
+  background: var(--cpk-blur-cool);
 }
 
 .blur-circle--4 {
@@ -69,7 +69,7 @@
   height: 609px;
   left: 508px;
   top: 702px;
-  background: #f3f3fc;
+  background: var(--cpk-blur-bright);
 }
 
 .blur-circle--5 {
@@ -77,7 +77,7 @@
   height: 446px;
   left: 128px;
   top: 331px;
-  background: rgba(255, 243, 136, 0.3);
+  background: var(--cpk-blur-gold);
 }
 
 .blur-circle--6 {
@@ -85,7 +85,7 @@
   height: 446px;
   left: -205px;
   top: 803px;
-  background: rgba(255, 172, 77, 0.2);
+  background: var(--cpk-blur-warm);
 }
 
 .composer-header {
@@ -146,6 +146,8 @@
   --mat-form-field-container-height: 40px;
   --mat-form-field-container-vertical-padding: 8px;
 
+  // Kept ::ng-deep: sizes the child renderer-picker component's field from the
+  // header context. Cross-component layout sizing, not theming.
   ::ng-deep .renderer-picker-field {
     width: 176px;
     max-width: 46vw;
@@ -160,7 +162,11 @@
   background: transparent;
 
   // Let the lavender page + blur circles show through the drawer container.
-  ::ng-deep .mat-drawer-container,
+  // Token-based override (replaces a former ::ng-deep .mat-drawer-container
+  // rule): the sidenav container reads its ground from this Material token,
+  // and the host element itself carries the class so no piercing is needed.
+  --mat-sidenav-content-background-color: transparent;
+
   &.mat-drawer-container {
     background-color: transparent;
     color: var(--cpk-text-primary);
@@ -182,6 +188,10 @@
   --mat-sidenav-container-shape: 8px;
   --mat-sidenav-background-color: transparent;
 
+  // Kept ::ng-deep: these target Material's internal scroll/list structure
+  // (inner scroll container radius+overflow, nav-list padding, list-item
+  // geometry) for which Material exposes no theming token — only layout, no
+  // colour, so they carry no theme risk.
   ::ng-deep .mat-drawer-inner-container {
     background: transparent;
     border-radius: var(--cpk-radius-card);

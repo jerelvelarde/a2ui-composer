@@ -107,6 +107,9 @@ mat-expansion-panel.llm-log-panel {
   border-radius: 4px;
   overflow: visible !important;
 
+  // Kept ::ng-deep: styles the expansion-panel internals (sticky header,
+  // body padding/radius, title layout). Structural; the colours inside all
+  // read themed --mat-sys-* tokens so dark mode is covered.
   ::ng-deep {
     .mat-expansion-panel-content-wrapper {
       overflow: hidden;

@@ -66,6 +66,8 @@
     --mdc-list-list-item-container-height: 36px;
     cursor: pointer;
 
+    // Kept ::ng-deep: left-aligns Material's list-item content wrapper. Layout
+    // only; no token controls list-item text alignment.
     ::ng-deep .mdc-list-item__content {
       text-align: left;
     }

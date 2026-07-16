@@ -63,6 +63,9 @@
     min-height: 0;
     display: block;
 
+    // Kept ::ng-deep: same full-height form-field structural override as the
+    // raw JSON editor (hide outline, stretch wrapper/flex/infix). Layout only,
+    // no token equivalent.
     ::ng-deep .mdc-notched-outline {
       display: none !important;
     }

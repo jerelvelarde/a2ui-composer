@@ -32,11 +32,6 @@
   --app-on-success-container: #a3e9a4;
 }
 
-:host-context(.dark-theme) .prompt-form-field {
-  --mdc-outlined-text-field-outline-color: rgba(255, 255, 255, 0.2) !important;
-  --mdc-outlined-text-field-hover-outline-color: rgba(255, 255, 255, 0.3) !important;
-}
-
 .preview-frame-container {
   display: flex;
   flex-direction: column;
@@ -318,26 +313,15 @@
 
   .prompt-form-field {
     width: 100%;
-    --mdc-outlined-text-field-container-shape: 20px !important;
-    --mdc-outlined-text-field-outline-color: rgba(0, 0, 0, 0.12) !important;
-    --mdc-outlined-text-field-focus-outline-color: var(--mat-sys-primary) !important;
-    --mdc-outlined-text-field-hover-outline-color: rgba(0, 0, 0, 0.2) !important;
-
-    ::ng-deep {
-      .mdc-notched-outline__leading,
-      .mdc-notched-outline__notch,
-      .mdc-notched-outline__trailing {
-        border-color: var(--mat-sys-outline-variant) !important;
-      }
-    }
-
-    &.mat-focused ::ng-deep {
-      .mdc-notched-outline__leading,
-      .mdc-notched-outline__notch,
-      .mdc-notched-outline__trailing {
-        border-color: var(--mat-sys-primary) !important;
-      }
-    }
+    // Material M3 form-field theming tokens replace the former ::ng-deep
+    // notched-outline overrides. These `--mat-form-field-outlined-*` tokens
+    // are the values the notch pieces actually read, and the mat-sys colours
+    // they point at theme in both light and dark (dropping a dark-only
+    // override block).
+    --mat-form-field-outlined-container-shape: 20px;
+    --mat-form-field-outlined-outline-color: var(--mat-sys-outline-variant);
+    --mat-form-field-outlined-hover-outline-color: var(--mat-sys-outline);
+    --mat-form-field-outlined-focus-outline-color: var(--mat-sys-primary);
 
     textarea {
       font-size: 13px;
@@ -398,11 +382,10 @@
     animation: pulseText 1.5s infinite ease-in-out;
   }
 
-  /* Redesigned Spinner using standard Angular Material Spinner properties */
+  /* Spinner colour via Material's public progress-spinner token (replaces a
+   * former ::ng-deep circle stroke override). */
   mat-spinner {
-    ::ng-deep circle {
-      stroke: var(--mat-sys-primary) !important;
-    }
+    --mat-progress-spinner-active-indicator-color: var(--mat-sys-primary);
   }
 
   /* Beautiful large Material Icons representing final milestones statuses */
@@ -430,9 +413,7 @@
       color: var(--mat-sys-on-tertiary-container);
     }
     mat-spinner {
-      ::ng-deep circle {
-        stroke: var(--mat-sys-tertiary) !important;
-      }
+      --mat-progress-spinner-active-indicator-color: var(--mat-sys-tertiary);
     }
   }
 
@@ -442,9 +423,7 @@
       color: var(--mat-sys-on-primary-container);
     }
     mat-spinner {
-      ::ng-deep circle {
-        stroke: var(--mat-sys-primary) !important;
-      }
+      --mat-progress-spinner-active-indicator-color: var(--mat-sys-primary);
     }
   }
 

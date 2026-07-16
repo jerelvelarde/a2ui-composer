@@ -76,6 +76,10 @@
     flex: 1 1 auto;
     display: block;
 
+    // Kept ::ng-deep: stretches the form-field's internal wrapper/flex/infix
+    // to full height and hides the notched outline so the JSON textarea fills
+    // the panel. Pure structural layout (no colour), which Material exposes no
+    // token for.
     ::ng-deep .mdc-notched-outline {
       display: none !important;
     }

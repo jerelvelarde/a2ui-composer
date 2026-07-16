@@ -143,6 +143,8 @@
   }
 }
 
+// Kept ::ng-deep: aligns the slide toggle's label row (flex, gap, label
+// padding/wrap). Layout only; the label colour reads a themed token.
 ::ng-deep body .mat-mdc-slide-toggle {
   .mat-internal-form-field,
   .mdc-form-field {

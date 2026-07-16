@@ -244,6 +244,10 @@
   box-sizing: border-box;
 }
 
+// Kept ::ng-deep: reshapes Material's tab internals (header sizing, body
+// flex-fill, badge geometry) so the debug drawer fills its panel. This is
+// structural layout with no token equivalent; the only colours inside are the
+// count badges above, which now read themed Material system tokens.
 ::ng-deep .mat-mdc-tab-group {
   height: 100%;
   display: flex;
@@ -271,14 +275,16 @@
       right: -18px !important;
     }
 
+    // Themed count badges: Material system colour pairs keep readable
+    // contrast in both light and dark (replacing hard-coded hex).
     .events-badge-host .mat-badge-content {
-      background-color: #3f51b5 !important;
-      color: #ffffff !important;
+      background-color: var(--mat-sys-primary) !important;
+      color: var(--mat-sys-on-primary) !important;
     }
 
     .errors-badge-host .mat-badge-content {
-      background-color: #ba1a1a !important;
-      color: #ffffff !important;
+      background-color: var(--mat-sys-error) !important;
+      color: var(--mat-sys-on-error) !important;
     }
   }
 

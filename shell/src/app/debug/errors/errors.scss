@@ -55,6 +55,9 @@ table {
     vertical-align: middle;
   }
 
+  // Severity badges read the semantic status tokens so they theme: the
+  // translucent status backgrounds sit correctly on both light and dark
+  // surfaces (the former hard-coded pastel fills washed out on dark chrome).
   .source-badge {
     padding: 2px 6px;
     border-radius: 4px;
@@ -63,16 +66,16 @@ table {
     text-transform: uppercase;
 
     &.exception {
-      background-color: #ffdad6;
-      color: #ba1a1a;
+      background-color: var(--cpk-critical-bg);
+      color: var(--cpk-critical);
     }
     &.console {
-      background-color: #ffe082;
-      color: #ff8f00;
+      background-color: var(--cpk-warning-bg);
+      color: var(--cpk-warning);
     }
     &.validation {
-      background-color: #e8f5e9;
-      color: #2e7d32;
+      background-color: var(--cpk-success-bg);
+      color: var(--cpk-success);
     }
   }
 
@@ -84,21 +87,21 @@ table {
     text-transform: uppercase;
 
     &.error {
-      background-color: #ffdad6;
-      color: #ba1a1a;
+      background-color: var(--cpk-critical-bg);
+      color: var(--cpk-critical);
     }
     &.warn {
-      background-color: #ffe082;
-      color: #ff8f00;
+      background-color: var(--cpk-warning-bg);
+      color: var(--cpk-warning);
     }
     &.info {
-      background-color: #e8f0fe;
-      color: #1a73e8;
+      background-color: var(--cpk-accent-bg);
+      color: var(--cpk-accent);
     }
     &.debug,
     &.log {
-      background-color: #f1f3f4;
-      color: #5f6368;
+      background-color: var(--mat-sys-surface-container-highest);
+      color: var(--cpk-text-secondary);
     }
   }
 
@@ -120,6 +123,8 @@ table {
       height: 28px;
       line-height: 28px;
 
+      // Kept ::ng-deep: hides the icon button's expanded touch target so the
+      // compact inline row action fits. No token gates the touch-target size.
       ::ng-deep .mat-mdc-button-touch-target {
         display: none;
       }
@@ -161,7 +166,7 @@ table {
       color: var(--mat-sys-error);
       padding: 8px;
       border-left: 3px solid var(--mat-sys-error);
-      background: rgba(186, 26, 26, 0.05);
+      background: var(--cpk-critical-bg);
       border-radius: 0 4px 4px 0;
     }
   }

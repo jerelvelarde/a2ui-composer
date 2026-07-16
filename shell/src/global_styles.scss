@@ -259,6 +259,15 @@ $dark-theme: mat.define-theme(
   --cpk-glass-bg-hover: rgba(255, 255, 255, 0.62);
   --cpk-glass-bg-selected: rgba(255, 255, 255, 0.78);
 
+  // --- Background blur circles (signature depth cue behind all routes) ---
+  // Tokenised so the treatment themes; dark values become subtle brand glows
+  // rather than the light-mode pastel blobs (which read as washed-out light
+  // patches on a near-black page).
+  --cpk-blur-warm: rgba(255, 172, 77, 0.2);
+  --cpk-blur-cool: #c9c9da;
+  --cpk-blur-bright: #f3f3fc;
+  --cpk-blur-gold: rgba(255, 243, 136, 0.3);
+
   // --- Line ----------------------------------------------------------
   --cpk-glass-border: #ffffff;
   --cpk-border: #cfcfe0;
@@ -325,6 +334,12 @@ $dark-theme: mat.define-theme(
   --cpk-glass-bg: rgba(38, 38, 46, 0.55);
   --cpk-glass-bg-hover: rgba(58, 58, 68, 0.6);
   --cpk-glass-bg-selected: rgba(78, 78, 92, 0.72);
+
+  // --- Background blur circles (subtle brand glows over the dark page) ---
+  --cpk-blur-warm: rgba(255, 172, 77, 0.06);
+  --cpk-blur-cool: rgba(67, 85, 185, 0.2);
+  --cpk-blur-bright: rgba(99, 102, 160, 0.14);
+  --cpk-blur-gold: rgba(186, 195, 255, 0.05);
 
   // --- Line ----------------------------------------------------------
   --cpk-glass-border: rgba(255, 255, 255, 0.12);
