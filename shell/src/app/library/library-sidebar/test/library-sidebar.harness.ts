@@ -16,7 +16,6 @@
 
 import {ComponentHarness} from '@angular/cdk/testing';
 import {MatListHarness} from '@angular/material/list/testing';
-import {MatButtonHarness} from '@angular/material/button/testing';
 
 /**
  * Test harness for the `LibrarySidebar` component. Exposes the rendered list of
@@ -27,9 +26,10 @@ export class LibrarySidebarHarness extends ComponentHarness {
   static hostSelector = 'a2ui-composer-library-sidebar';
 
   private readonly getList = this.locatorForOptional(MatListHarness);
-  private readonly getSaveButton = this.locatorFor(
-    MatButtonHarness.with({text: /Save current draft/}),
-  );
+  // The "Save current draft" control is the shared kit button
+  // (`<a2ui-composer-button>`), which renders an inner native <button>. Locate
+  // that inner element so disabled state and clicks act on the real control.
+  private readonly getSaveButton = this.locatorFor('a2ui-composer-button.save-draft-button button');
 
   /** Human-readable names of every widget currently rendered in the list. */
   async getWidgetNames(): Promise<string[]> {
@@ -55,6 +55,6 @@ export class LibrarySidebarHarness extends ComponentHarness {
   /** Whether the "Save current draft" control is disabled. */
   async isSaveDisabled(): Promise<boolean> {
     const button = await this.getSaveButton();
-    return button.isDisabled();
+    return button.getProperty<boolean>('disabled');
   }
 }

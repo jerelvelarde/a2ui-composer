@@ -15,161 +15,143 @@
 -->
 
 <div class="settings-container">
-  <mat-card class="settings-card">
-    <mat-card-header>
-      <mat-card-title>A2UI Composer Settings</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
-        <div class="form-section">
-          <h3>Renderer Application URL</h3>
-          @if (isLocked()) {
-            <div class="locked-notice">
-              <mat-icon color="warn" aria-hidden="true">lock</mat-icon>
-              <span
-                >Active URL configuration is locked by enterprise policy (allowOverrides:
-                false).</span
-              >
-            </div>
+  <h1 class="settings-title">A2UI Composer Settings</h1>
+
+  <a2ui-composer-card class="settings-card" [padding]="true">
+    <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
+      <div class="form-section">
+        @if (isLocked()) {
+          <div class="locked-notice">
+            <mat-icon color="warn" aria-hidden="true">lock</mat-icon>
+            <span
+              >Active URL configuration is locked by enterprise policy (allowOverrides:
+              false).</span
+            >
+          </div>
+        }
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Renderer Application URL</mat-label>
+          <input matInput formControlName="rendererUrl" placeholder="http://localhost:3000" />
+          @if (settingsForm.controls.rendererUrl.hasError('required')) {
+            <mat-error>Renderer URL is required.</mat-error>
           }
+          @if (settingsForm.controls.rendererUrl.hasError('pattern')) {
+            <mat-error>
+              Must be a valid HTTP/HTTPS URL or relative path starting with "/".
+            </mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      @if (isThirdParty()) {
+        <div class="form-section">
+          <h3 class="section-title">Gemini API Provisioning</h3>
+          <p class="description">
+            Your personal Gemini API key is encrypted and stored locally in your browser's secure
+            database using the
+            <a
+              href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Web Crypto API</a
+            >. Neither Google nor anyone else has access to this key.
+          </p>
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Target Renderer URL</mat-label>
-            <input matInput formControlName="rendererUrl" placeholder="http://localhost:3000" />
-            @if (settingsForm.controls.rendererUrl.hasError('required')) {
-              <mat-error>Renderer URL is required.</mat-error>
+            <mat-label>Gemini API Key</mat-label>
+            <input
+              matInput
+              [type]="hideApiKey() ? 'password' : 'text'"
+              formControlName="apiKey"
+              placeholder="Enter your Gemini API key"
+            />
+            <button
+              mat-icon-button
+              matSuffix
+              class="api-key-toggle-btn"
+              type="button"
+              (click)="hideApiKey.set(!hideApiKey())"
+              [attr.aria-label]="hideApiKey() ? 'Show API key' : 'Hide API key'"
+            >
+              <mat-icon aria-hidden="true">{{
+                hideApiKey() ? 'visibility' : 'visibility_off'
+              }}</mat-icon>
+            </button>
+            @if (!settingsForm.controls.apiKey.value) {
+              <mat-hint class="warning-hint"
+                >Gemini Assistant feature will be disabled without a valid API key.</mat-hint
+              >
             }
-            @if (settingsForm.controls.rendererUrl.hasError('pattern')) {
-              <mat-error>
-                Must be a valid HTTP/HTTPS URL or relative path starting with "/".
-              </mat-error>
+            @if (settingsForm.controls.apiKey.hasError('pattern')) {
+              <mat-error>API key cannot be empty whitespace.</mat-error>
             }
           </mat-form-field>
         </div>
+      }
 
-        @if (isThirdParty()) {
-          <div class="form-section">
-            <h3>Gemini API Provisioning</h3>
-            <p class="description">
-              Your personal Gemini API key is encrypted and stored locally in your browser's secure
-              database using the
-              <a
-                href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API"
-                target="_blank"
-                rel="noopener noreferrer"
-                >Web Crypto API</a
-              >. Neither Google nor anyone else has access to this key.
-            </p>
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Gemini API Key</mat-label>
-              <input
-                matInput
-                [type]="hideApiKey() ? 'password' : 'text'"
-                formControlName="apiKey"
-                placeholder="Enter your Gemini API key"
-              />
-              <button
-                mat-icon-button
-                matSuffix
-                class="api-key-toggle-btn"
-                type="button"
-                (click)="hideApiKey.set(!hideApiKey())"
-                [attr.aria-label]="hideApiKey() ? 'Show API key' : 'Hide API key'"
-              >
-                <mat-icon aria-hidden="true">{{
-                  hideApiKey() ? 'visibility' : 'visibility_off'
-                }}</mat-icon>
-              </button>
-              @if (!settingsForm.controls.apiKey.value) {
-                <mat-hint class="warning-hint"
-                  >Gemini Assistant feature will be disabled without a valid API key.</mat-hint
-                >
-              }
-              @if (settingsForm.controls.apiKey.hasError('pattern')) {
-                <mat-error>API key cannot be empty whitespace.</mat-error>
-              }
-            </mat-form-field>
+      <div class="form-section developer-auth-section">
+        <h3 class="section-title">Developer Authentication Overrides</h3>
+        <p class="description">
+          Simulate external 3P context to verify Gemini API key provisioning workflows.
+        </p>
+        @if (isLocked()) {
+          <div class="locked-notice auth-locked-notice">
+            <mat-icon color="warn" aria-hidden="true">lock</mat-icon>
+            <span>Authentication mode overrides are locked by enterprise policy.</span>
           </div>
         }
-
-        <div class="form-section developer-auth-section">
-          <h3>Developer Authentication Overrides</h3>
-          <p class="description">
-            Simulate external 3P context to verify Gemini API key provisioning workflows.
-          </p>
-          @if (isLocked()) {
-            <div class="locked-notice auth-locked-notice">
-              <mat-icon color="warn" aria-hidden="true">lock</mat-icon>
-              <span>Authentication mode overrides are locked by enterprise policy.</span>
-            </div>
-          }
-          <div class="toggle-container" style="margin-top: 12px">
-            <mat-slide-toggle
-              [checked]="forceThirdPartyAuth()"
-              [disabled]="isLocked()"
-              (change)="toggleForceThirdPartyAuth()"
-            >
-              Force External Third-Party Authentication Mode
-            </mat-slide-toggle>
-          </div>
-        </div>
-      </form>
-    </mat-card-content>
-    <mat-card-actions align="end">
-      <button mat-flat-button color="primary" (click)="saveSettings()">Save Settings</button>
-    </mat-card-actions>
-  </mat-card>
-
-  <mat-card class="status-card">
-    <mat-card-header>
-      <mat-card-title>Connection Status & Diagnostics</mat-card-title>
-      <mat-card-subtitle>Real-time monitoring bridge</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="status-badges">
-        <mat-chip-set>
-          <mat-chip
-            class="status-badge bridge-badge"
-            [color]="bridgeConnected() ? 'primary' : 'accent'"
-            >Bridge: {{ bridgeConnected() ? 'Connected' : 'Disconnected' }}</mat-chip
+        <div class="toggle-container">
+          <mat-slide-toggle
+            [checked]="forceThirdPartyAuth()"
+            [disabled]="isLocked()"
+            (change)="toggleForceThirdPartyAuth()"
           >
-          <mat-chip
-            class="status-badge catalog-badge"
-            [color]="
-              catalogStatus() === 'Connected'
-                ? 'primary'
-                : catalogStatus() === 'Indexing'
-                  ? 'accent'
-                  : catalogStatus() === 'Error'
-                    ? 'warn'
-                    : undefined
-            "
-            >Catalog Handshake: {{ catalogStatus() }}</mat-chip
-          >
-        </mat-chip-set>
-      </div>
-
-      <div class="overlay-logs">
-        <h4>Overlay Logs Preview</h4>
-        <div class="logs-console">
-          @if (catalogErrorMessage()) {
-            <code class="error-log" style="color: #f44336; font-weight: bold"
-              >[Catalog Error] {{ catalogErrorMessage() }}</code
-            >
-          } @else if (catalogStatus() === 'Connected') {
-            <code class="success-log" style="color: #4caf50"
-              >[System] Catalog handshake completed successfully. Active catalog ready.</code
-            >
-          } @else if (catalogStatus() === 'Indexing') {
-            <code>[System] Catalog handshake in progress. Indexing metadata...</code>
-          } @else if (bridgeConnected()) {
-            <code>[System] Bridge connected. Initializing catalog handshake...</code>
-          } @else {
-            <code
-              >[System] Bridge disconnected. Waiting for iframe handshake initialization...</code
-            >
-          }
+            Force External Third-Party Authentication Mode
+          </mat-slide-toggle>
         </div>
       </div>
-    </mat-card-content>
-  </mat-card>
+
+      <div class="form-actions">
+        <a2ui-composer-button variant="primary" type="button" (click)="saveSettings()"
+          >Save Settings</a2ui-composer-button
+        >
+      </div>
+    </form>
+  </a2ui-composer-card>
+
+  <a2ui-composer-card class="status-card" [padding]="true">
+    <div class="status-card__header">
+      <h2 class="section-title">Connection Status &amp; Diagnostics</h2>
+      <p class="section-subtitle">Real-time monitoring bridge</p>
+    </div>
+
+    <div class="status-badges">
+      <a2ui-composer-status-chip class="status-badge bridge-badge" [status]="bridgeChipStatus()"
+        >Bridge: {{ bridgeConnected() ? 'Connected' : 'Disconnected' }}</a2ui-composer-status-chip
+      >
+      <a2ui-composer-status-chip class="status-badge catalog-badge" [status]="catalogChipStatus()"
+        >Catalog Handshake: {{ catalogStatus() }}</a2ui-composer-status-chip
+      >
+    </div>
+
+    <div class="overlay-logs">
+      <h4>Overlay Logs Preview</h4>
+      <div class="logs-console">
+        @if (catalogErrorMessage()) {
+          <code class="log-line log-line--error">[Catalog Error] {{ catalogErrorMessage() }}</code>
+        } @else if (catalogStatus() === 'Connected') {
+          <code class="log-line log-line--success"
+            >[System] Catalog handshake completed successfully. Active catalog ready.</code
+          >
+        } @else if (catalogStatus() === 'Indexing') {
+          <code class="log-line">[System] Catalog handshake in progress. Indexing metadata...</code>
+        } @else if (bridgeConnected()) {
+          <code class="log-line">[System] Bridge connected. Initializing catalog handshake...</code>
+        } @else {
+          <code class="log-line"
+            >[System] Bridge disconnected. Waiting for iframe handshake initialization...</code
+          >
+        }
+      </div>
+    </div>
+  </a2ui-composer-card>
 </div>

@@ -27,6 +27,8 @@ export class WidgetGalleryHarness extends ComponentHarness {
   private readonly getCards = this.locatorForAll('.widget-card');
   private readonly getCloneButtons = this.locatorForAll('.widget-clone-button');
   private readonly getRenderedFrame = this.locatorForOptional(RenderedFrameHarness);
+  private readonly getPreviewPanel = this.locatorForOptional('.widget-preview-panel');
+  private readonly getCloseButton = this.locatorForOptional('.widget-preview-close');
 
   /**
    * Returns the number of widget cards rendered in the grid.
@@ -34,6 +36,39 @@ export class WidgetGalleryHarness extends ComponentHarness {
   async getCardCount(): Promise<number> {
     const cards = await this.getCards();
     return cards.length;
+  }
+
+  /**
+   * Reports whether the card at the given index carries the selected-state
+   * class used to render the accent highlight.
+   *
+   * @param index Zero-based index of the card to inspect.
+   */
+  async isCardSelected(index: number): Promise<boolean> {
+    const cards = await this.getCards();
+    const card = cards[index];
+    if (!card) {
+      throw new Error(`No widget card at index ${index}`);
+    }
+    return card.hasClass('is-selected');
+  }
+
+  /**
+   * Reports whether the side preview panel is currently rendered.
+   */
+  async hasPreviewPanel(): Promise<boolean> {
+    return !!(await this.getPreviewPanel());
+  }
+
+  /**
+   * Closes the side preview panel via its close action.
+   */
+  async clickClosePreview(): Promise<void> {
+    const button = await this.getCloseButton();
+    if (!button) {
+      throw new Error('No preview close button is rendered');
+    }
+    await button.click();
   }
 
   /**

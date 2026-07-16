@@ -32,6 +32,8 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatBadgeModule} from '@angular/material/badge';
 import {StartupResolution} from '../startup-resolution/startup-resolution';
 import {HostCommunication} from '../host-communication/host-communication';
+import {ChatState} from '../../chat/chat-state/chat-state';
+import {MessageRole} from '../../chat/llm-client/llm-client';
 import {PreviewBridgeMessageType} from 'a2ui-bridge';
 
 const EVENTS_TAB_INDEX = 1;
@@ -72,9 +74,12 @@ interface WorkspaceMessagePayload {
 export class ComposerWorkspace implements OnInit {
   private startupResolution = inject(StartupResolution);
   private hostComm = inject(HostCommunication);
+  private chatState = inject(ChatState);
 
   isExtension = signal(false);
   isDebugCollapsed = signal(false);
+  /** Collapses the assistant column into a slim rail to reclaim width. */
+  isChatCollapsed = signal(false);
   showMockRules = signal(false);
   selectedTabIndex = signal(0);
   unreadEventsCount = signal(0);
@@ -137,11 +142,21 @@ export class ComposerWorkspace implements OnInit {
     this.isExtension.set(isExt);
     if (isExt) {
       this.isDebugCollapsed.set(true);
+    } else {
+      // When there is no conversation yet the assistant column is dead width,
+      // so it starts collapsed into a slim rail and expands on demand or once
+      // the user engages it. The stacked extension layout is left expanded.
+      const hasConversation = this.chatState.chatHistory().some(m => m.role !== MessageRole.SYSTEM);
+      this.isChatCollapsed.set(!hasConversation);
     }
   }
 
   toggleDebugCollapse(): void {
     this.isDebugCollapsed.update(c => !c);
+  }
+
+  toggleChatCollapse(): void {
+    this.isChatCollapsed.update(c => !c);
   }
 
   clearAllLogs(): void {

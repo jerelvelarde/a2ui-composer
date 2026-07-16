@@ -65,6 +65,35 @@ describe('IconBrowser Component', () => {
     expect(count).toBe(MATERIAL_ICON_NAMES.length);
   });
 
+  it('surfaces the total icon count on initial (unfiltered) render', async () => {
+    expect(await harness.getResultCountText()).toBe(`${MATERIAL_ICON_NAMES.length} icons`);
+  });
+
+  it('updates the result count to match the filtered subset', async () => {
+    const expected = MATERIAL_ICON_NAMES.filter(n => n.includes('cloud'));
+    expect(expected.length).toBeGreaterThanOrEqual(2);
+
+    await harness.setFilter('cloud');
+    fixture.detectChanges();
+
+    expect(await harness.getResultCountText()).toBe(`${expected.length} results`);
+  });
+
+  it('shows a singular result label for a single match', async () => {
+    await harness.setFilter('wifi');
+    fixture.detectChanges();
+
+    expect(await harness.getIconCount()).toBe(1);
+    expect(await harness.getResultCountText()).toBe('1 result');
+  });
+
+  it('shows a zero result count for a non-matching query', async () => {
+    await harness.setFilter('zzz-no-such-icon');
+    fixture.detectChanges();
+
+    expect(await harness.getResultCountText()).toBe('0 results');
+  });
+
   it('narrows the visible grid to the exact matching subset when a query is typed', async () => {
     const expected = MATERIAL_ICON_NAMES.filter(n => n.includes('cloud'));
     // Guard the fixture: the query must be a strict, non-trivial subset.

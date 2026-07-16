@@ -17,14 +17,14 @@
 <div class="library-sidebar">
   <a2ui-composer-section-label>Widget Library</a2ui-composer-section-label>
 
-  <button
-    mat-stroked-button
+  <a2ui-composer-button
+    variant="primary"
     class="save-draft-button"
     [disabled]="!canSave()"
     (click)="saveCurrentDraft()"
   >
     Save current draft
-  </button>
+  </a2ui-composer-button>
 
   @if (widgets().length === 0) {
     <a2ui-composer-empty-state

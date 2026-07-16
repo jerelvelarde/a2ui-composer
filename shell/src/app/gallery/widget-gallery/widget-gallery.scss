@@ -24,8 +24,8 @@
 .widget-gallery-container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 24px;
+  gap: var(--cpk-space-4);
+  padding: var(--cpk-space-5);
   box-sizing: border-box;
   height: 100%;
   overflow-y: auto;
@@ -35,7 +35,7 @@
 .widget-gallery-header {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--cpk-space-1);
 }
 
 .widget-gallery-title {
@@ -50,87 +50,127 @@
   color: var(--cpk-text-secondary, #57575b);
 }
 
+// Split layout: grid on the left, preview panel docked on the right. On narrow
+// viewports the two stack (see the media query below), preserving Phase 1
+// responsiveness.
+.widget-gallery-body {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cpk-space-4);
+  min-height: 0;
+}
+
 .widget-grid {
+  flex: 1 1 auto;
+  min-width: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-  align-items: start;
+  // Equal-height grid: uniform column tracks + the default `stretch` alignment
+  // make every card in a row match the tallest card's height.
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--cpk-space-4);
+  align-items: stretch;
 }
 
 .widget-card {
-  cursor: pointer;
-  padding: 16px;
-  background: var(--cpk-glass-bg, rgba(255, 255, 255, 0.5));
-  border: 2px solid var(--cpk-glass-border, #ffffff);
-  border-radius: var(--cpk-radius-card, 8px);
-  box-shadow: var(--cpk-shadow-card, 0px 6px 6px -2px rgba(1, 5, 7, 0.08));
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition:
-    box-shadow 0.2s ease,
-    transform 0.2s ease,
-    background-color 0.2s ease;
+  // The card host fills its stretched grid track; a column layout lets the
+  // clone action pin to the bottom so cards stay visually aligned.
+  display: flex;
+  flex-direction: column;
+  gap: var(--cpk-space-3);
+  height: 100%;
+  box-sizing: border-box;
 
-  // Neutralise Angular Material's elevated-card surface + elevation.
-  --mdc-elevated-card-container-color: transparent;
-  --mdc-elevated-card-container-elevation: none;
-  --mdc-elevated-card-container-shape: var(--cpk-radius-card, 8px);
-
-  ::ng-deep .mat-mdc-card-header {
-    padding: 0;
-  }
-
-  ::ng-deep .mat-mdc-card-title {
-    color: var(--cpk-text-primary, #010507);
-    font-weight: 600;
-    font-size: 1rem;
-  }
-
-  ::ng-deep .mat-mdc-card-subtitle {
-    color: var(--cpk-text-secondary, #57575b);
-    font-size: 0.8125rem;
-  }
-
-  &:hover,
   &:focus-visible {
-    box-shadow: var(--cpk-shadow-elevated, 0px 16px 24px -8px rgba(1, 5, 7, 0.12));
-    transform: translateY(-2px);
+    outline: 2px solid var(--cpk-accent);
+    outline-offset: 2px;
   }
 
+  // Selected card: accent border + wash while its preview is open.
   &.is-selected {
-    background: var(--cpk-glass-bg-selected, rgba(255, 255, 255, 0.7));
-    box-shadow: var(--cpk-shadow-elevated, 0px 16px 24px -8px rgba(1, 5, 7, 0.12));
+    border-color: var(--cpk-accent);
+    background: var(--cpk-accent-bg);
+    box-shadow: var(--cpk-shadow-elevated);
   }
 }
 
-.widget-preview-panel {
+.widget-card-body {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 16px;
-  border-radius: var(--cpk-radius-card, 8px);
-  background: var(--cpk-glass-bg, rgba(255, 255, 255, 0.5));
-  border: 2px solid var(--cpk-glass-border, #ffffff);
-  box-shadow: var(--cpk-shadow-card, 0px 6px 6px -2px rgba(1, 5, 7, 0.08));
+  gap: var(--cpk-space-1);
+  flex: 1 1 auto;
+}
+
+.widget-card-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--cpk-text-primary);
+}
+
+.widget-card-description {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--cpk-text-secondary);
+}
+
+.widget-card-actions {
+  display: flex;
+  margin-top: auto;
+}
+
+.widget-preview-panel {
+  flex: 0 0 clamp(320px, 38%, 460px);
+  align-self: flex-start;
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cpk-space-3);
+  padding: var(--cpk-space-4);
+  border-radius: var(--cpk-radius-card);
+  background: var(--cpk-glass-bg);
+  border: 1px solid var(--cpk-glass-border);
+  box-shadow: var(--cpk-shadow-card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+}
+
+.widget-preview-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cpk-space-3);
 }
 
 .widget-preview-title {
   margin: 0;
   font-size: 1.125rem;
   font-weight: 600;
-  color: var(--cpk-text-primary, #010507);
+  color: var(--cpk-text-primary);
 }
 
 .widget-preview {
   display: block;
-  border-radius: 8px;
+  border-radius: var(--cpk-radius-item);
   overflow: hidden;
 
   a2ui-composer-rendered-frame {
     display: block;
     width: 100%;
     height: 100%;
+  }
+}
+
+// Narrow viewports: stack the grid and preview, and let the preview flow
+// inline instead of docking.
+@media (max-width: 900px) {
+  .widget-gallery-body {
+    flex-direction: column;
+  }
+
+  .widget-preview-panel {
+    flex: 1 1 auto;
+    width: 100%;
+    position: static;
   }
 }

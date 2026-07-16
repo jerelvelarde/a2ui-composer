@@ -20,14 +20,13 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
-import {MatCardModule} from '@angular/material/card';
-import {MatChipsModule} from '@angular/material/chips';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {StartupResolution} from '../../shell/startup-resolution/startup-resolution';
 import {DOCUMENT, PlatformLocation} from '@angular/common';
 import {HostCommunication} from '../../shell/host-communication/host-communication';
 import {CatalogManagement} from '../../storage/catalog-management/catalog-management';
 import {AppConfigProvider, AuthType} from '../app-config-provider/app-config-provider';
+import {Button, Card, StatusChip} from '../../shared/ui';
 import {locationAssign} from 'safevalues/dom';
 
 /**
@@ -43,9 +42,10 @@ import {locationAssign} from 'safevalues/dom';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
-    MatCardModule,
-    MatChipsModule,
     MatSlideToggleModule,
+    Button,
+    Card,
+    StatusChip,
   ],
   templateUrl: './settings.ng.html',
   styleUrl: './settings.scss',
@@ -77,6 +77,32 @@ export class Settings implements OnInit {
   readonly catalogErrorMessage: Signal<string | null> = computed(() =>
     this.catalogManagement.catalogError(),
   );
+
+  /**
+   * Maps the live bridge state to a semantic status-chip colour.
+   * A live monitoring bridge is healthy (success); no bridge means nothing is
+   * being monitored, which is a failure state (critical).
+   */
+  readonly bridgeChipStatus: Signal<'success' | 'critical'> = computed(() =>
+    this.bridgeConnected() ? 'success' : 'critical',
+  );
+
+  /**
+   * Maps the catalog handshake state to a semantic status-chip colour:
+   * Connected => success, Error/Disconnected => critical (nothing usable),
+   * Indexing => info (transient in-progress state).
+   */
+  readonly catalogChipStatus: Signal<'success' | 'warning' | 'critical' | 'info'> = computed(() => {
+    switch (this.catalogStatus()) {
+      case 'Connected':
+        return 'success';
+      case 'Indexing':
+        return 'info';
+      case 'Error':
+      default:
+        return 'critical';
+    }
+  });
 
   // Matches either absolute HTTP/HTTPS URLs (starting with http:// or https://)
   // or relative paths starting with '/'.

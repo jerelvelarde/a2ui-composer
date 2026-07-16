@@ -18,6 +18,17 @@
   [class.is-collapsed]="isExtensionMode()"
   [class.is-locked]="isLocked()"
 >
+  <div class="raw-frame-toolbar">
+    <span class="raw-frame-eyebrow">Editable source</span>
+    <a2ui-composer-button
+      variant="ghost"
+      class="format-button"
+      [disabled]="isLocked()"
+      (click)="formatDocument()"
+    >
+      Format
+    </a2ui-composer-button>
+  </div>
   @if (isJsonInvalid()) {
     <div class="invalid-json-badge">⚠️ Invalid JSON syntax detected.</div>
   }
@@ -29,6 +40,8 @@
       (ngModelChange)="onLayoutChange($event)"
       [readOnly]="isLocked()"
       placeholder="Enter raw JSON here..."
+      spellcheck="false"
+      wrap="off"
     ></textarea>
   </mat-form-field>
 </div>

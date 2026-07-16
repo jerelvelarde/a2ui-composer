@@ -35,6 +35,7 @@ import {CatalogManagement} from '../../storage/catalog-management/catalog-manage
 import {StateSync} from '../../chat/state-sync/state-sync';
 import {ChatState} from '../../chat/chat-state/chat-state';
 import {tryParseJsonArray} from '../../utils/json';
+import {Button} from '../../shared/ui';
 
 /**
  * Hosts the raw JSON view of active surface models, allowing direct source editing
@@ -43,7 +44,7 @@ import {tryParseJsonArray} from '../../utils/json';
 @Component({
   selector: 'a2ui-composer-raw-frame',
   standalone: true,
-  imports: [MatFormFieldModule, MatInputModule, FormsModule],
+  imports: [MatFormFieldModule, MatInputModule, FormsModule, Button],
   templateUrl: './raw-frame.ng.html',
   styleUrl: './raw-frame.scss',
 })
@@ -64,12 +65,23 @@ export class RawFrame {
   private readonly destroyRef = inject(DestroyRef);
   private readonly layoutInput$ = new Subject<string>();
 
+  /**
+   * Tracks the last value this editor itself pushed into shared draft state.
+   * When an incoming `activeDraft` update matches it, the change originated
+   * from the user's own keystrokes, so we leave the buffer exactly as typed
+   * (no reformatting). Any other update is treated as an external source
+   * (e.g. a completed LLM stream) and is pretty-printed on arrival.
+   */
+  private lastPushedDraft: string | null = null;
+
   /** Public lock indicator preventing typing deadlocks during generative LLM stream turns. */
   protected readonly isLocked = this.chatState.isProgrammaticStreamActive;
 
   constructor() {
-    // Initialize backing editor layout state Signal dynamically from the volatile session cache
-    this.layoutJson = signal(this.stateSync.hydrateActiveDraft());
+    // Initialize backing editor layout state Signal dynamically from the volatile
+    // session cache, pretty-printed so the authoring surface never renders a
+    // run-on string.
+    this.layoutJson = signal(this.formatLayout(this.stateSync.hydrateActiveDraft()));
     effect(() => {
       const catalog = this.catalogManagement.activeCatalog();
       if (catalog) {
@@ -89,13 +101,20 @@ export class RawFrame {
     effect(() => {
       const activeDraftVal = this.stateSync.activeDraft();
       untracked(() => {
-        if (this.layoutJson() !== activeDraftVal) {
+        // Self-originated edits are left exactly as the user typed them so the
+        // caret and in-progress text are never disturbed.
+        if (activeDraftVal === this.lastPushedDraft) {
+          return;
+        }
+        // External updates are pretty-printed (2-space indent) for readability.
+        const formatted = this.formatLayout(activeDraftVal);
+        if (this.layoutJson() !== formatted) {
           queueMicrotask(() => {
-            this.layoutJson.set(activeDraftVal);
+            this.layoutJson.set(formatted);
 
             // Run live render updating matching activeDraft commits
             try {
-              const payload = this.parseLayoutString(activeDraftVal);
+              const payload = this.parseLayoutString(formatted);
               if (payload !== null) {
                 this.isJsonInvalid.set(false);
                 this.hostCommunication.sendRenderA2UI(payload);
@@ -137,8 +156,43 @@ export class RawFrame {
 
   protected onLayoutChange(value: string): void {
     this.layoutJson.set(value);
+    this.lastPushedDraft = value;
     this.layoutInput$.next(value);
     this.stateSync.updateDraft(value);
+  }
+
+  /**
+   * Pretty-prints the current buffer in place (2-space indent), routing the
+   * result through the normal edit path so it round-trips and re-renders.
+   * Invalid JSON is left untouched.
+   */
+  protected formatDocument(): void {
+    const formatted = this.formatLayout(this.layoutJson());
+    if (formatted !== this.layoutJson()) {
+      this.onLayoutChange(formatted);
+    }
+  }
+
+  /**
+   * Returns a pretty-printed (2-space indented) JSON-array rendering of a raw
+   * layout string. Accepts both the JSON-array and JSON-Lines input formats
+   * the editor supports and normalises to the canonical array form. If the
+   * value cannot be parsed it is returned unchanged so partial/invalid edits
+   * are never destroyed.
+   */
+  private formatLayout(value: string): string {
+    try {
+      if (!value.trim()) {
+        return value;
+      }
+      const parsed = this.parseLayoutString(value);
+      if (parsed === null) {
+        return value;
+      }
+      return JSON.stringify(parsed, null, 2);
+    } catch {
+      return value;
+    }
   }
 
   /**

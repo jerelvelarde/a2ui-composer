@@ -33,23 +33,22 @@
   width: 240px;
   min-width: 0;
   overflow-y: auto;
-  border-right: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
-  background-color: var(--mat-sys-surface-container-low, #fcfcfc);
-}
-
-.catalog-title {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--mat-sys-on-surface, #1c1b1f);
+  padding: var(--cpk-space-2) 0;
+  border-right: 1px solid var(--cpk-divider);
+  background-color: var(--cpk-surface);
 }
 
 .gallery-catalog .catalog-list {
+  padding-top: 0;
+
   .category-header {
-    font: var(--mat-sys-typescale-label-medium);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
+    display: flex;
+
+    // Tighten the kit section-label rhythm for a dense catalog column: keep
+    // the first group flush with the top and add breathing room between groups.
+    &:not(:first-of-type) {
+      margin-top: var(--cpk-space-3);
+    }
   }
 
   .component-nav-item {
@@ -58,11 +57,12 @@
     text-align: left;
     border: none;
     background: transparent;
-    border-radius: 20px;
-    margin: 2px 12px;
-    padding-left: 12px;
-    width: calc(100% - 24px);
+    border-radius: var(--cpk-radius-pill);
+    margin: var(--cpk-space-1) var(--cpk-space-3);
+    padding-left: var(--cpk-space-3);
+    width: calc(100% - var(--cpk-space-5));
     box-sizing: border-box;
+    color: var(--cpk-text-secondary);
     --mdc-list-list-item-container-height: 36px;
     cursor: pointer;
 
@@ -72,15 +72,17 @@
 
     &:hover,
     &:focus {
-      background-color: var(--mat-sys-surface-container-low, #f2f2f2);
+      background-color: var(--cpk-glass-bg-hover);
+      color: var(--cpk-text-primary);
     }
 
     &.mat-mdc-list-item-activated,
     &[activated='true'] {
-      background-color: var(--mat-sys-surface-container-high, #e2e2e2);
+      background-color: var(--cpk-glass-bg-selected);
+      color: var(--cpk-text-primary);
 
       span[matListItemTitle] {
-        font-weight: 500;
+        font-weight: 600;
       }
     }
 
@@ -98,12 +100,16 @@
   box-sizing: border-box;
   height: 100%;
   min-width: 0;
-  padding: 24px;
-  background-color: var(--mat-sys-background, #fafafa);
+  display: flex;
+  flex-direction: column;
+  gap: var(--cpk-space-5);
+  padding: var(--cpk-space-5);
+  background-color: transparent;
   overflow-y: auto;
 }
 
 .gallery-empty {
+  flex: 1 1 auto;
   min-height: 60%;
 }
 
@@ -123,84 +129,95 @@
     width: 100%;
     max-height: 38vh;
     border-right: none;
-    border-bottom: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
+    border-bottom: 1px solid var(--cpk-divider);
   }
 
   .gallery-content {
     height: auto;
     flex: 1 1 auto;
-    padding: 16px;
+    padding: var(--cpk-space-4);
+    gap: var(--cpk-space-4);
   }
 }
 
 .details-panel {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--cpk-space-5);
 }
 
 .details-header {
-  border-bottom: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
-  padding-bottom: 16px;
+  border-bottom: 1px solid var(--cpk-divider);
+  padding-bottom: var(--cpk-space-4);
 }
 
 .component-title {
-  margin: 0 0 8px 0;
-  font-size: 1.75rem;
-  font-weight: 400;
+  margin: 0 0 var(--cpk-space-2) 0;
+  font-family: var(--cpk-font-body);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--cpk-text-primary);
 }
 
 .component-description {
   margin: 0;
+  font-family: var(--cpk-font-body);
   font-size: 0.95rem;
-  color: var(--mat-sys-on-surface-variant, #49454f);
-  line-height: 1.4;
+  color: var(--cpk-text-secondary);
+  line-height: 1.5;
 }
 
-.preview-card,
-.usage-card,
-.properties-card {
-  border-radius: 8px;
-  border: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
-  background-color: var(--mat-sys-surface, #ffffff);
+// Shared heading treatment for every detail card (Preview / Usage / Properties)
+// so the three surfaces read as one consistent system.
+.detail-card__title {
+  margin: 0;
+  font-family: var(--cpk-font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--cpk-text-primary);
 }
 
-.preview-placeholder {
-  min-height: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--mat-sys-surface-container-highest, #f0f0f0);
-  border: 2px dashed var(--mat-sys-outline-variant, #e0e0e0);
-  border-radius: 4px;
-  font-style: italic;
-  color: var(--mat-sys-on-surface-variant, #777);
+.preview-card .detail-card__title {
+  margin-bottom: var(--cpk-space-3);
+}
+
+.properties-card .detail-card__title {
+  margin-bottom: var(--cpk-space-4);
+}
+
+.preview-surface {
+  min-height: 280px;
+  border-radius: var(--cpk-radius-item);
+  overflow: hidden;
+  background-color: var(--cpk-surface-elevated);
+  border: 1px solid var(--cpk-divider);
 }
 
 .usage-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-right: 8px;
+  margin-bottom: var(--cpk-space-3);
 }
 
 .copy-button {
-  color: var(--mat-sys-primary, #6750a4);
+  color: var(--cpk-accent);
 }
 
 .usage-code-block {
   margin: 0;
-  padding: 12px;
-  background-color: var(--mat-sys-surface-container-high, #f5f5f5);
-  border-radius: 4px;
+  padding: var(--cpk-space-3);
+  background-color: var(--cpk-surface-elevated);
+  border: 1px solid var(--cpk-divider);
+  border-radius: var(--cpk-radius-item);
   overflow-x: auto;
 }
 
 .usage-code {
-  font-family: 'Roboto Mono', monospace;
+  font-family: var(--cpk-font-mono);
   font-size: 0.85rem;
   line-height: 1.5;
-  color: var(--mat-sys-on-surface, #333);
+  color: var(--cpk-text-primary);
 }
 
 .properties-table {
@@ -209,18 +226,26 @@
 
   th {
     font-weight: 600;
+    color: var(--cpk-text-secondary);
   }
 
   .prop-name {
-    font-weight: 500;
-    color: var(--mat-sys-primary, #6750a4);
+    font-weight: 600;
+    color: var(--cpk-accent);
   }
 
-  .prop-type code {
-    background-color: var(--mat-sys-surface-container-high, #f0f0f0);
-    padding: 2px 6px;
-    border-radius: 4px;
+  .prop-description {
+    color: var(--cpk-text-secondary);
+  }
+
+  .prop-type code,
+  .prop-default code {
+    font-family: var(--cpk-font-mono);
+    background-color: var(--cpk-accent-bg);
+    padding: 2px var(--cpk-space-2);
+    border-radius: var(--cpk-radius-sm);
     font-size: 0.8rem;
+    color: var(--cpk-text-primary);
   }
 
   .prop-required {
@@ -228,20 +253,14 @@
       font-size: 18px;
       height: 18px;
       width: 18px;
+      color: var(--cpk-accent);
     }
   }
 
   .optional-label {
     font-size: 0.8rem;
     font-style: italic;
-    opacity: 0.6;
-  }
-
-  .prop-default code {
-    background-color: var(--mat-sys-surface-container-high, #f0f0f0);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.8rem;
+    color: var(--cpk-text-faint);
   }
 }
 
@@ -254,8 +273,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  gap: 16px;
-  color: var(--mat-sys-on-surface-variant, #666);
+  padding: var(--cpk-space-5);
+  gap: var(--cpk-space-4);
+  color: var(--cpk-text-secondary);
+  font-family: var(--cpk-font-body);
   font-size: 0.9rem;
 }

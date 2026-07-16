@@ -28,10 +28,33 @@
   width: 100%;
   flex: 1;
 
+  .data-model-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--cpk-space-2);
+    padding: var(--cpk-space-1) 0 var(--cpk-space-2);
+    flex-shrink: 0;
+  }
+
+  .data-model-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--cpk-text-faint);
+  }
+
+  .data-model-hint {
+    font-size: 11px;
+    color: var(--cpk-text-faint);
+  }
+
   .invalid-json-badge {
-    color: #f44336;
-    font-weight: bold;
-    padding: 8px 0;
+    color: var(--cpk-critical);
+    font-weight: 600;
+    padding: var(--cpk-space-1) 0;
+    font-size: 12px;
   }
 
   .data-model-field {
@@ -64,7 +87,10 @@
     }
 
     textarea {
-      font-family: monospace;
+      font-family: var(--cpk-font-mono);
+      font-size: 12.5px;
+      line-height: 1.6;
+      tab-size: 2;
       resize: none;
       flex: 1 1 auto;
       height: 100%;
@@ -73,6 +99,7 @@
       border: none;
       outline: none;
       background: transparent;
+      color: var(--cpk-text-primary);
     }
   }
 }

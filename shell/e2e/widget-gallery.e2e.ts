@@ -188,7 +188,7 @@ test.describe('Widget Gallery User Journey', () => {
     const cloneButtons = page.locator('.widget-clone-button');
     await expect(cloneButtons.first()).toBeVisible();
     const sourceName = (
-      await page.locator('.widget-card').first().locator('mat-card-title').textContent()
+      await page.locator('.widget-card').first().locator('.widget-card-title').textContent()
     )?.trim();
     await cloneButtons.first().click();
 

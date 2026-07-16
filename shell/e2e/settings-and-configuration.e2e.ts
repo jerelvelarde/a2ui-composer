@@ -38,7 +38,7 @@ test.describe('Settings and Client Configuration', () => {
     test('persists configuration successfully, triggers explicit window reload, and unlocks guarded routes', async ({
       page,
     }) => {
-      const rendererInput = page.getByLabel('Target Renderer URL');
+      const rendererInput = page.getByLabel('Renderer Application URL');
       await rendererInput.fill('http://localhost:3000');
 
       const apiKeyInput = page.getByLabel('Gemini API Key');
@@ -91,8 +91,8 @@ test.describe('Settings and Client Configuration', () => {
       });
 
       await page.goto('/settings');
-      await expect(page.getByLabel('Target Renderer URL')).toBeDisabled();
-      const rendererVal = await page.getByLabel('Target Renderer URL').inputValue();
+      await expect(page.getByLabel('Renderer Application URL')).toBeDisabled();
+      const rendererVal = await page.getByLabel('Renderer Application URL').inputValue();
       expect(rendererVal).toBe('http://locked-renderer.com');
     });
 

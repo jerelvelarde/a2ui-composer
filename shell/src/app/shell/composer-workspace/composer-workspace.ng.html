@@ -15,7 +15,25 @@
 -->
 
 <div class="workspace-container" [class.extension-mode]="isExtension()">
-  <div class="left-panel">
+  <div class="left-panel" [class.chat-collapsed]="isChatCollapsed()">
+    <button
+      mat-icon-button
+      class="chat-collapse-toggle"
+      (click)="toggleChatCollapse()"
+      [attr.aria-label]="isChatCollapsed() ? 'Expand assistant' : 'Collapse assistant'"
+      [matTooltip]="isChatCollapsed() ? 'Expand assistant' : 'Collapse assistant'"
+      matTooltipPosition="right"
+    >
+      <mat-icon aria-hidden="true">{{
+        isChatCollapsed() ? 'chevron_right' : 'chevron_left'
+      }}</mat-icon>
+    </button>
+    @if (isChatCollapsed()) {
+      <button class="chat-rail" (click)="toggleChatCollapse()" aria-label="Expand assistant">
+        <mat-icon class="chat-rail__icon" aria-hidden="true">forum</mat-icon>
+        <span class="chat-rail__label">Gemini Assistant</span>
+      </button>
+    }
     <a2ui-composer-chat-panel></a2ui-composer-chat-panel>
   </div>
   <div class="right-panel">

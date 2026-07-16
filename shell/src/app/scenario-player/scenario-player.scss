@@ -16,8 +16,8 @@
 
 .scenario-player-container {
   display: flex;
-  gap: 16px;
-  padding: 16px;
+  gap: var(--cpk-space-4);
+  padding: var(--cpk-space-4);
   height: 100%;
   box-sizing: border-box;
 }
@@ -51,53 +51,61 @@
   flex-direction: column;
   flex: 0 0 360px;
   min-width: 0;
-  gap: 12px;
+  gap: var(--cpk-space-3);
 }
 
 .scenario-header {
   .scenario-title {
     margin: 0;
     font-size: 1.25rem;
-    font-weight: 500;
+    font-weight: 600;
+    color: var(--cpk-text-primary);
   }
 
   .scenario-subtitle {
-    margin: 4px 0 0;
+    margin: var(--cpk-space-1) 0 0;
     font-size: 0.85rem;
-    opacity: 0.7;
+    color: var(--cpk-text-secondary);
   }
 }
 
 .scenario-controls {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--cpk-space-2);
   flex-wrap: wrap;
 
   .scenario-status {
     text-transform: capitalize;
-    font-weight: 500;
-    margin-left: 4px;
+    font-weight: 600;
+    margin-left: var(--cpk-space-1);
+    color: var(--cpk-text-secondary);
   }
 
   .scenario-progress-count {
     margin-left: auto;
+    font-family: var(--cpk-font-mono);
     font-variant-numeric: tabular-nums;
-    opacity: 0.7;
+    color: var(--cpk-text-faint);
   }
 }
 
 .scenario-timeline {
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 8px;
+  // Fill the panel's remaining height so no dead space strands below the
+  // step list; the list scrolls internally once it outgrows the panel.
+  flex: 1 1 auto;
+  min-height: 0;
+  border: 1px solid var(--cpk-border);
+  border-radius: var(--cpk-radius-card);
+  background: var(--cpk-surface);
   overflow-y: auto;
   padding: 0;
 
   .timeline-tick {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 8px 12px;
+    gap: var(--cpk-space-3);
+    padding: var(--cpk-space-2) var(--cpk-space-3);
 
     .tick-index {
       display: inline-flex;
@@ -105,33 +113,36 @@
       justify-content: center;
       width: 24px;
       height: 24px;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.08);
+      border-radius: var(--cpk-radius-pill);
+      background: var(--cpk-accent-bg);
+      color: var(--cpk-text-secondary);
       font-size: 0.75rem;
+      font-weight: 600;
       flex: 0 0 auto;
     }
 
     .tick-label {
       flex: 1 1 auto;
       min-width: 0;
+      color: var(--cpk-text-primary);
     }
 
     .tick-check {
-      color: var(--mat-sys-primary, #1976d2);
+      color: var(--cpk-accent);
       flex: 0 0 auto;
     }
 
     &.tick-active {
-      background: rgba(25, 118, 210, 0.08);
+      background: var(--cpk-accent-bg);
 
       .tick-index {
-        background: var(--mat-sys-primary, #1976d2);
-        color: #fff;
+        background: var(--cpk-accent);
+        color: var(--cpk-accent-contrast);
       }
     }
 
     &.tick-emitted .tick-label {
-      opacity: 0.6;
+      color: var(--cpk-text-faint);
     }
   }
 }
@@ -140,15 +151,28 @@
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
+  gap: var(--cpk-space-3);
   min-width: 0;
+}
 
-  mat-card-content {
-    flex: 1 1 auto;
-    display: flex;
-  }
+.scenario-preview-body {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
 
   a2ui-composer-rendered-frame {
     flex: 1 1 auto;
     display: block;
+    min-width: 0;
+  }
+
+  .scenario-preview-empty {
+    // Opaque overlay over the still-mounted frame, so playback keeps applying
+    // to the frame underneath the moment streaming starts.
+    position: absolute;
+    inset: 0;
+    border-radius: var(--cpk-radius-card);
+    background: var(--cpk-surface-elevated);
   }
 }

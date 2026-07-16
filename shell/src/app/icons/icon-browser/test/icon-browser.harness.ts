@@ -26,6 +26,7 @@ export class IconBrowserHarness extends ComponentHarness {
 
   private readonly getCards = this.locatorForAll('.icon-card');
   private readonly getFilterInput = this.locatorFor(MatInputHarness);
+  private readonly getResultCount = this.locatorForOptional('[data-testid="icon-result-count"]');
   private readonly getEmptyState = this.locatorForOptional('a2ui-composer-empty-state');
   private readonly getSelectedName = this.locatorForOptional('.selected-name');
   private readonly getSelectedSnippet = this.locatorForOptional('.selected-snippet');
@@ -70,6 +71,15 @@ export class IconBrowserHarness extends ComponentHarness {
       throw new Error(`No icon card at index ${index}`);
     }
     await card.click();
+  }
+
+  /**
+   * The visible match-count summary text (e.g. "128 icons" / "12 results"),
+   * or null when the count element is absent.
+   */
+  async getResultCountText(): Promise<string | null> {
+    const count = await this.getResultCount();
+    return count ? (await count.text()).trim() : null;
   }
 
   /** Whether the empty-result state message is shown. */

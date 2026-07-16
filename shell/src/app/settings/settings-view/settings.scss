@@ -16,22 +16,49 @@
  */
 
 .settings-container {
-  padding: 24px;
-  max-width: 600px;
+  // Readable form measure — widened from the stranded 600px column and
+  // centred. No spacing token maps to a container measure, so px is used
+  // here for the layout width only.
+  max-width: 720px;
   margin: 0 auto;
+  padding: var(--cpk-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--cpk-space-5);
 }
 
-.form-section {
-  margin-top: 16px;
+.settings-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cpk-text-primary);
+}
 
-  h3 {
-    margin-bottom: 8px;
+.section-title {
+  margin: 0 0 var(--cpk-space-2);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cpk-text-primary);
+}
+
+.section-subtitle {
+  margin: var(--cpk-space-1) 0 0;
+  font-size: 13px;
+  color: var(--cpk-text-secondary);
+}
+
+// Sections within the settings card, separated by a token-driven divider.
+.form-section {
+  & + .form-section {
+    margin-top: var(--cpk-space-5);
+    padding-top: var(--cpk-space-5);
+    border-top: 1px solid var(--cpk-divider);
   }
 
   .description {
-    margin-bottom: 12px;
+    margin: 0 0 var(--cpk-space-3);
     font-size: 13px;
-    color: #555;
+    color: var(--cpk-text-secondary);
   }
 }
 
@@ -39,55 +66,80 @@
   width: 100%;
 }
 
+.toggle-container {
+  margin-top: var(--cpk-space-3);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--cpk-space-5);
+  padding-top: var(--cpk-space-4);
+  border-top: 1px solid var(--cpk-divider);
+}
+
 .locked-notice {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  background-color: var(--mat-sys-error-container);
-  color: var(--mat-sys-on-error-container);
-  border-radius: 6px;
-  margin-bottom: 16px;
+  gap: var(--cpk-space-2);
+  padding: var(--cpk-space-3) var(--cpk-space-4);
+  background: var(--cpk-critical-bg);
+  color: var(--cpk-critical);
+  border-radius: var(--cpk-radius-item);
+  margin-bottom: var(--cpk-space-4);
   font-size: 13px;
   font-weight: 500;
 }
 
-.status-card {
-  margin-top: 24px;
+.status-card__header {
+  margin-bottom: var(--cpk-space-4);
 }
 
 .status-badges {
-  margin-top: 12px;
-  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cpk-space-2);
+  margin-bottom: var(--cpk-space-4);
 }
 
 .overlay-logs {
   h4 {
-    margin-bottom: 8px;
+    margin: 0 0 var(--cpk-space-2);
     font-size: 14px;
+    color: var(--cpk-text-primary);
   }
 
   .logs-console {
-    background-color: #1e1e1e;
-    color: #00ff00;
-    padding: 12px;
-    border-radius: 6px;
-    font-family: monospace;
+    background: var(--cpk-surface-elevated);
+    color: var(--cpk-text-secondary);
+    padding: var(--cpk-space-3);
+    border: 1px solid var(--cpk-border);
+    border-radius: var(--cpk-radius-item);
+    font-family: var(--cpk-font-mono);
     font-size: 12px;
     line-height: 1.5;
     // Long diagnostic strings / URLs must wrap rather than force the card to
     // scroll horizontally on narrow viewports.
     overflow-wrap: anywhere;
 
-    code {
+    .log-line {
       display: block;
+    }
+
+    .log-line--success {
+      color: var(--cpk-success);
+    }
+
+    .log-line--error {
+      color: var(--cpk-critical);
+      font-weight: 700;
     }
   }
 }
 
 @media (max-width: 768px) {
   .settings-container {
-    padding: 16px;
+    padding: var(--cpk-space-4);
   }
 }
 
@@ -96,20 +148,20 @@
   .mdc-form-field {
     display: inline-flex !important;
     align-items: center !important;
-    gap: 16px !important;
+    gap: var(--cpk-space-4) !important;
   }
 
   label,
   .mdc-label {
-    padding-left: 16px !important;
+    padding-left: var(--cpk-space-4) !important;
     white-space: normal !important;
     line-height: 1.4 !important;
-    color: var(--mat-sys-on-surface) !important;
+    color: var(--cpk-text-primary) !important;
   }
 }
 
 .warning-hint {
-  color: var(--mat-sys-on-surface-variant);
+  color: var(--cpk-text-secondary);
   display: block;
-  margin-top: 4px;
+  margin-top: var(--cpk-space-1);
 }

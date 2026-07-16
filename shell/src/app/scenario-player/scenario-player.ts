@@ -24,13 +24,12 @@ import {
   signal,
   WritableSignal,
 } from '@angular/core';
-import {MatCardModule} from '@angular/material/card';
-import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatListModule} from '@angular/material/list';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {RenderedFrame} from '../preview/rendered/rendered-frame';
 import {HostCommunication} from '../shell/host-communication/host-communication';
+import {Button, Card, EmptyState, SectionLabel} from '../shared/ui';
 import {BASIC_CATALOG_SCENARIO, Scenario} from './scenarios/basic-catalog-scenario';
 
 /** Interval between simulated stream frames, in milliseconds. */
@@ -51,12 +50,14 @@ export type PlaybackState = 'stopped' | 'playing' | 'paused' | 'completed';
   selector: 'a2ui-composer-scenario-player',
   standalone: true,
   imports: [
-    MatCardModule,
-    MatButtonModule,
     MatIconModule,
     MatListModule,
     MatProgressBarModule,
     RenderedFrame,
+    Button,
+    Card,
+    EmptyState,
+    SectionLabel,
   ],
   templateUrl: './scenario-player.ng.html',
   styleUrl: './scenario-player.scss',
@@ -81,6 +82,16 @@ export class ScenarioPlayer implements OnDestroy {
 
   /** Whether the player is actively advancing through ticks. */
   protected readonly isPlaying = computed(() => this._playbackState() === 'playing');
+
+  /**
+   * Whether the preview surface is still blank — the initial state and the
+   * state after a reset, before any tick has been emitted. Drives the preview
+   * empty-state placeholder. The rendered frame stays mounted underneath so
+   * playback still applies to it the moment streaming begins.
+   */
+  protected readonly previewIsEmpty = computed(
+    () => this._playbackState() === 'stopped' && this._cursor() === 0,
+  );
 
   /** Fractional playback progress (0-100) for the progress bar. */
   protected readonly progress = computed(() =>

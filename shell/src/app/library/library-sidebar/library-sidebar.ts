@@ -16,13 +16,13 @@
 
 import {Component, OnInit, computed, inject} from '@angular/core';
 import {MatListModule} from '@angular/material/list';
-import {MatButtonModule} from '@angular/material/button';
 import {WidgetLibrary} from '../../storage/widget-library/widget-library';
 import {WidgetRecord} from '../../storage/models/widget-storage.model';
 import {StateSync} from '../../chat/state-sync/state-sync';
 import {CatalogManagement} from '../../storage/catalog-management/catalog-management';
 import {SectionLabel} from '../../shared/ui/section-label/section-label';
 import {EmptyState} from '../../shared/ui/empty-state/empty-state';
+import {Button} from '../../shared/ui';
 
 /**
  * Sidebar section that lists the author's persisted widget library and offers a
@@ -34,7 +34,7 @@ import {EmptyState} from '../../shared/ui/empty-state/empty-state';
 @Component({
   selector: 'a2ui-composer-library-sidebar',
   standalone: true,
-  imports: [MatListModule, MatButtonModule, SectionLabel, EmptyState],
+  imports: [MatListModule, Button, SectionLabel, EmptyState],
   templateUrl: './library-sidebar.ng.html',
   styleUrl: './library-sidebar.scss',
 })

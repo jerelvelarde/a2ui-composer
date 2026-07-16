@@ -18,7 +18,9 @@
   <aside class="gallery-catalog" aria-label="Component catalog">
     <mat-nav-list class="catalog-list">
       @for (group of componentsList(); track group.category) {
-        <div mat-subheader class="category-header">{{ group.category }}</div>
+        <a2ui-composer-section-label class="category-header">{{
+          group.category
+        }}</a2ui-composer-section-label>
         @for (comp of group.components; track comp) {
           <button
             mat-list-item
@@ -34,59 +36,53 @@
   </aside>
 
   <section class="gallery-content">
-    <div [class.hidden-frame]="!selectedComponentKey()">
-      <mat-card class="preview-card">
-        <mat-card-header>
-          <mat-card-title>Preview</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
+    <div class="preview-frame" [class.hidden-frame]="!selectedComponentKey()">
+      <a2ui-composer-card class="detail-card preview-card">
+        <h3 class="detail-card__title">Preview</h3>
+        <div class="preview-surface">
           <a2ui-composer-rendered-frame></a2ui-composer-rendered-frame>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </a2ui-composer-card>
     </div>
 
     @if (selectedComponentKey() && catalogManagement.activeCatalog()) {
       <div class="details-panel">
-        <div class="details-header">
+        <header class="details-header">
           <h2 class="component-title">{{ selectedComponentKey() }}</h2>
           @if (selectedComponentDescription()) {
             <p class="component-description">{{ selectedComponentDescription() }}</p>
           }
-        </div>
+        </header>
 
-        <mat-card class="usage-card">
-          <mat-card-header class="usage-header">
-            <mat-card-title>Usage</mat-card-title>
+        <a2ui-composer-card class="detail-card usage-card">
+          <div class="detail-card__header usage-header">
+            <h3 class="detail-card__title">Usage</h3>
             @if (!loadingUsages()) {
-              <button
-                mat-icon-button
+              <a2ui-composer-button
+                variant="ghost"
+                class="copy-button"
                 (click)="copyToClipboard()"
                 aria-label="Copy to Clipboard"
-                class="copy-button"
               >
                 <mat-icon>content_copy</mat-icon>
-              </button>
+              </a2ui-composer-button>
             }
-          </mat-card-header>
-          <mat-card-content>
-            @if (loadingUsages()) {
-              <div class="usage-loading-spinner">
-                <mat-spinner diameter="32"></mat-spinner>
-                <span>Loading usage samples...</span>
-              </div>
-            } @else {
-              <pre
-                class="usage-code-block"
-              ><code class="usage-code">{{ selectedComponentUsage() }}</code></pre>
-            }
-          </mat-card-content>
-        </mat-card>
+          </div>
+          @if (loadingUsages()) {
+            <div class="usage-loading-spinner">
+              <mat-spinner diameter="32"></mat-spinner>
+              <span>Loading usage samples...</span>
+            </div>
+          } @else {
+            <pre
+              class="usage-code-block"
+            ><code class="usage-code">{{ selectedComponentUsage() }}</code></pre>
+          }
+        </a2ui-composer-card>
 
-        <mat-card class="properties-card">
-          <mat-card-header>
-            <mat-card-title>Properties</mat-card-title>
-          </mat-card-header>
-          <mat-card-content class="properties-content">
+        <a2ui-composer-card class="detail-card properties-card">
+          <h3 class="detail-card__title">Properties</h3>
+          <div class="properties-content">
             <table mat-table [dataSource]="selectedComponentProperties()" class="properties-table">
               <!-- Name Column -->
               <ng-container matColumnDef="name">
@@ -137,8 +133,8 @@
               <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
               <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
             </table>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </a2ui-composer-card>
       </div>
     } @else if (catalogManagement.catalogError()) {
       <a2ui-composer-empty-state

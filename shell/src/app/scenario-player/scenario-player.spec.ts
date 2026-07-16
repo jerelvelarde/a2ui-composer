@@ -89,6 +89,41 @@ describe('ScenarioPlayer', () => {
     expect(host.sendRenderA2UI).not.toHaveBeenCalled();
   });
 
+  it('renders all three transport controls as design-system buttons, not Material buttons', () => {
+    const el = fixture.nativeElement as HTMLElement;
+
+    // Play, Pause and Reset are all the shared kit button.
+    expect(el.querySelectorAll('a2ui-composer-button')).toHaveLength(3);
+
+    // No legacy Material button treatments remain on the transport controls.
+    expect(
+      el.querySelector(
+        '[mat-flat-button], [mat-stroked-button], [mat-button], [mat-raised-button]',
+      ),
+    ).toBeNull();
+  });
+
+  it('shows the kit empty-state placeholder before playback and hides it once playing', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('a2ui-composer-empty-state')).not.toBeNull();
+
+    component.play();
+    fixture.detectChanges();
+    expect(el.querySelector('a2ui-composer-empty-state')).toBeNull();
+  });
+
+  it('restores the empty-state placeholder after reset', () => {
+    component.play();
+    vi.advanceTimersByTime(SCENARIO_TICK_INTERVAL_MS);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('a2ui-composer-empty-state')).toBeNull();
+
+    component.reset();
+    fixture.detectChanges();
+    expect(el.querySelector('a2ui-composer-empty-state')).not.toBeNull();
+  });
+
   it('advances through the ticks emitting each per-tick payload in exact order', () => {
     component.play();
     expect(component.playbackState()).toBe('playing');

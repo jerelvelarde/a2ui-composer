@@ -26,16 +26,14 @@ import {
 } from '@angular/core';
 import {JsonPipe} from '@angular/common';
 import {MatListModule} from '@angular/material/list';
-import {MatCardModule} from '@angular/material/card';
 import {MatTableModule} from '@angular/material/table';
-import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {GalleryCatalog} from './services/gallery-catalog';
 import {CatalogManagement} from '../storage/catalog-management/catalog-management';
 import {RenderedFrame} from '../preview/rendered/rendered-frame';
 import {HostCommunication} from '../shell/host-communication/host-communication';
-import {EmptyState} from '../shared/ui/empty-state/empty-state';
+import {Button, Card, EmptyState, SectionLabel} from '../shared/ui';
 
 /**
  * Displays a split visual catalog gallery enabling search, interactive component selection,
@@ -47,13 +45,14 @@ import {EmptyState} from '../shared/ui/empty-state/empty-state';
   imports: [
     JsonPipe,
     MatListModule,
-    MatCardModule,
     MatTableModule,
-    MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
     RenderedFrame,
     EmptyState,
+    Button,
+    Card,
+    SectionLabel,
   ],
   templateUrl: './gallery.ng.html',
   styleUrl: './gallery.scss',

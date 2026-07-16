@@ -76,7 +76,7 @@ test.describe('Components Gallery User Journey', () => {
     await expect(page.getByRole('heading', {name: firstComponentName!, exact: true})).toBeVisible();
 
     // Assert card headers are visible
-    const cardHeaders = page.locator('mat-card-header mat-card-title');
+    const cardHeaders = page.locator('.detail-card__title');
     await expect(cardHeaders).toHaveText(['Preview', 'Usage', 'Properties']);
 
     // 7. Assert properties table is populated

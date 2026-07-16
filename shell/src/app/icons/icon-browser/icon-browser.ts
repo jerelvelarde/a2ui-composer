@@ -18,9 +18,8 @@ import {ChangeDetectionStrategy, Component, computed, signal} from '@angular/cor
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatIconModule} from '@angular/material/icon';
-import {MatButtonModule} from '@angular/material/button';
 import {MATERIAL_ICON_NAMES, iconSnippet} from './icon-catalog';
-import {EmptyState} from '../../shared/ui/empty-state/empty-state';
+import {Badge, Button, EmptyState} from '../../shared/ui';
 
 /**
  * Read-only icon browser. Renders the curated Material Icons set as a
@@ -31,7 +30,7 @@ import {EmptyState} from '../../shared/ui/empty-state/empty-state';
 @Component({
   selector: 'a2ui-composer-icon-browser',
   standalone: true,
-  imports: [MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, EmptyState],
+  imports: [MatFormFieldModule, MatInputModule, MatIconModule, Badge, Button, EmptyState],
   templateUrl: './icon-browser.ng.html',
   styleUrl: './icon-browser.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,6 +54,23 @@ export class IconBrowser {
       return this.allIcons;
     }
     return this.allIcons.filter(name => name.toLowerCase().includes(q));
+  });
+
+  /** How many icons match the current filter/search. */
+  protected readonly resultCount = computed<number>(() => this.filteredIcons().length);
+
+  /**
+   * Human-readable summary of the current match count. Reads as a total
+   * ("128 icons") when unfiltered and as a result count ("12 results") once a
+   * query is active, with correct singular/plural agreement.
+   */
+  protected readonly resultCountLabel = computed<string>(() => {
+    const count = this.resultCount();
+    const filtered = this.query().trim().length > 0;
+    if (filtered) {
+      return `${count} ${count === 1 ? 'result' : 'results'}`;
+    }
+    return `${count} ${count === 1 ? 'icon' : 'icons'}`;
   });
 
   /** The copyable A2UI `Icon` snippet for the selected icon, or null. */

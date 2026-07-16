@@ -15,6 +15,10 @@
 -->
 
 <div class="data-model-container">
+  <div class="data-model-toolbar">
+    <span class="data-model-eyebrow">Derived state</span>
+    <span class="data-model-hint">Reflects the live renderer</span>
+  </div>
   @if (isJsonInvalid()) {
     <div class="invalid-json-badge">⚠️ Invalid JSON syntax detected.</div>
   }
@@ -24,7 +28,7 @@
       aria-label="Data model JSON"
       [ngModel]="dataModelJson()"
       (ngModelChange)="dataModelJson.set($event)"
-      placeholder="Enter data model JSON here..."
+      placeholder="The renderer's data model will appear here."
     ></textarea>
   </mat-form-field>
 </div>

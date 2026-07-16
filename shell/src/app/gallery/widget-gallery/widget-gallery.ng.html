@@ -22,44 +22,59 @@
     </p>
   </header>
 
-  <div class="widget-grid" role="list">
-    @for (preset of presets; track preset.id) {
-      <mat-card
-        class="widget-card"
-        role="listitem"
-        tabindex="0"
-        [class.is-selected]="selectedPreset()?.id === preset.id"
-        (click)="openCard(preset)"
-        (keydown.enter)="openCard(preset)"
-        (keydown.space)="openCard(preset)"
-      >
-        <mat-card-header>
-          <mat-card-title>{{ preset.name }}</mat-card-title>
-          <mat-card-subtitle>{{ preset.description }}</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-actions>
-          <button
+  <div class="widget-gallery-body" [class.has-preview]="selectedPreset()">
+    <div class="widget-grid" role="list">
+      @for (preset of presets; track preset.id) {
+        <a2ui-composer-card
+          class="widget-card"
+          [interactive]="true"
+          role="listitem"
+          tabindex="0"
+          [class.is-selected]="selectedPreset()?.id === preset.id"
+          [attr.aria-pressed]="selectedPreset()?.id === preset.id"
+          (click)="openCard(preset)"
+          (keydown.enter)="openCard(preset)"
+          (keydown.space)="openCard(preset)"
+        >
+          <div class="widget-card-body">
+            <h3 class="widget-card-title">{{ preset.name }}</h3>
+            <p class="widget-card-description">{{ preset.description }}</p>
+          </div>
+          <div class="widget-card-actions">
+            <a2ui-composer-button
+              variant="secondary"
+              type="button"
+              class="widget-clone-button"
+              [attr.aria-label]="'Clone ' + preset.name + ' to library'"
+              (click)="cloneToLibrary($event, preset)"
+              (keydown.enter)="$event.stopPropagation()"
+              (keydown.space)="$event.stopPropagation()"
+            >
+              Clone to library
+            </a2ui-composer-button>
+          </div>
+        </a2ui-composer-card>
+      }
+    </div>
+
+    @if (selectedPreset(); as preset) {
+      <aside class="widget-preview-panel" aria-label="Widget preview">
+        <div class="widget-preview-heading">
+          <h2 class="widget-preview-title">{{ preset.name }}</h2>
+          <a2ui-composer-button
+            variant="ghost"
             type="button"
-            mat-stroked-button
-            class="widget-clone-button"
-            [attr.aria-label]="'Clone ' + preset.name + ' to library'"
-            (click)="cloneToLibrary($event, preset)"
-            (keydown.enter)="$event.stopPropagation()"
-            (keydown.space)="$event.stopPropagation()"
+            class="widget-preview-close"
+            aria-label="Close preview"
+            (click)="closePreview()"
           >
-            Clone to library
-          </button>
-        </mat-card-actions>
-      </mat-card>
+            Close
+          </a2ui-composer-button>
+        </div>
+        <div class="widget-preview" [style.min-height.px]="preset.height">
+          <a2ui-composer-rendered-frame></a2ui-composer-rendered-frame>
+        </div>
+      </aside>
     }
   </div>
-
-  @if (selectedPreset(); as preset) {
-    <section class="widget-preview-panel" aria-label="Widget preview">
-      <h2 class="widget-preview-title">{{ preset.name }}</h2>
-      <div class="widget-preview" [style.min-height.px]="preset.height">
-        <a2ui-composer-rendered-frame></a2ui-composer-rendered-frame>
-      </div>
-    </section>
-  }
 </div>

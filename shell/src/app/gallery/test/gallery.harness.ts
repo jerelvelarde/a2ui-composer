@@ -17,7 +17,6 @@
 import {ComponentHarness} from '@angular/cdk/testing';
 import {MatNavListHarness} from '@angular/material/list/testing';
 import {MatTableHarness} from '@angular/material/table/testing';
-import {MatButtonHarness} from '@angular/material/button/testing';
 import {RenderedFrameHarness} from '../../preview/rendered/test/rendered-frame.harness';
 
 /**
@@ -33,13 +32,11 @@ export class GalleryHarness extends ComponentHarness {
   private readonly getTitle = this.locatorForOptional('.component-title');
   private readonly getDescription = this.locatorForOptional('.component-description');
   private readonly getUsageCode = this.locatorForOptional('.usage-code');
-  private readonly getCopyButton = this.locatorForOptional(
-    MatButtonHarness.with({selector: '.copy-button'}),
-  );
+  private readonly getCopyButton = this.locatorForOptional('.copy-button');
   private readonly getEmptySubtitle = this.locatorForOptional(
     'a2ui-composer-empty-state .cpk-empty__description',
   );
-  private readonly getCardTitles = this.locatorForAll('mat-card-title');
+  private readonly getCardTitles = this.locatorForAll('.detail-card__title');
   private readonly getRenderedFrame = this.locatorForOptional(RenderedFrameHarness);
 
   /**

@@ -24,24 +24,18 @@
     </div>
 
     <div class="scenario-controls">
-      <button
-        mat-flat-button
-        color="primary"
-        class="control-play"
-        [disabled]="isPlaying()"
-        (click)="play()"
-      >
+      <a2ui-composer-button variant="primary" [disabled]="isPlaying()" (click)="play()">
         <mat-icon>play_arrow</mat-icon>
         Play
-      </button>
-      <button mat-stroked-button class="control-pause" [disabled]="!isPlaying()" (click)="pause()">
+      </a2ui-composer-button>
+      <a2ui-composer-button variant="secondary" [disabled]="!isPlaying()" (click)="pause()">
         <mat-icon>pause</mat-icon>
         Pause
-      </button>
-      <button mat-stroked-button class="control-reset" (click)="reset()">
+      </a2ui-composer-button>
+      <a2ui-composer-button variant="secondary" (click)="reset()">
         <mat-icon>replay</mat-icon>
         Reset
-      </button>
+      </a2ui-composer-button>
       <span class="scenario-status" data-testid="playback-state">{{ playbackState() }}</span>
       <span class="scenario-progress-count">{{ cursor() }} / {{ totalTicks }}</span>
     </div>
@@ -70,12 +64,18 @@
     </mat-nav-list>
   </div>
 
-  <mat-card class="scenario-preview-card">
-    <mat-card-header>
-      <mat-card-title>Preview</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
+  <a2ui-composer-card class="scenario-preview-card">
+    <a2ui-composer-section-label>Preview</a2ui-composer-section-label>
+    <div class="scenario-preview-body">
       <a2ui-composer-rendered-frame></a2ui-composer-rendered-frame>
-    </mat-card-content>
-  </mat-card>
+      @if (previewIsEmpty()) {
+        <a2ui-composer-empty-state
+          class="scenario-preview-empty"
+          icon="slideshow"
+          title="Nothing playing yet"
+          description="Press Play to replay the scenario frame by frame — the rendered surface appears here."
+        ></a2ui-composer-empty-state>
+      }
+    </div>
+  </a2ui-composer-card>
 </div>

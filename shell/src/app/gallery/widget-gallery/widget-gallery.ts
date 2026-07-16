@@ -16,9 +16,8 @@
 
 import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {MatButtonModule} from '@angular/material/button';
-import {MatCardModule} from '@angular/material/card';
 import {PreviewBridgeMessageType} from 'a2ui-bridge';
+import {Button, Card} from '../../shared/ui';
 import {RenderedFrame} from '../../preview/rendered/rendered-frame';
 import {HostCommunication} from '../../shell/host-communication/host-communication';
 import {CatalogManagement} from '../../storage/catalog-management/catalog-management';
@@ -42,7 +41,7 @@ const WIDGET_GALLERY_SURFACE_ID = 'widget-gallery-preview';
 @Component({
   selector: 'a2ui-composer-widget-gallery',
   standalone: true,
-  imports: [MatButtonModule, MatCardModule, RenderedFrame],
+  imports: [Button, Card, RenderedFrame],
   templateUrl: './widget-gallery.ng.html',
   styleUrl: './widget-gallery.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -108,6 +107,14 @@ export class WidgetGallery {
    */
   protected openCard(preset: WidgetGalleryPreset): void {
     this._selectedPreset.set(preset);
+  }
+
+  /**
+   * Closes the side preview panel, deselecting the currently open card. The
+   * grid reclaims the full width when no preview is open.
+   */
+  protected closePreview(): void {
+    this._selectedPreset.set(null);
   }
 
   /**

@@ -21,17 +21,27 @@
       A2UI renders Material Icons by name. Filter the set, then select an icon to copy its component
       snippet.
     </p>
-    <mat-form-field appearance="outline" class="icon-filter-field">
-      <mat-label>Filter icons</mat-label>
-      <input
-        matInput
-        type="text"
-        [value]="query()"
-        (input)="onFilter($event)"
-        placeholder="e.g. cloud"
-        aria-label="Filter icons by name"
-      />
-    </mat-form-field>
+    <div class="icon-filter-row">
+      <mat-form-field appearance="outline" class="icon-filter-field">
+        <mat-label>Filter icons</mat-label>
+        <input
+          matInput
+          type="text"
+          [value]="query()"
+          (input)="onFilter($event)"
+          placeholder="e.g. cloud"
+          aria-label="Filter icons by name"
+        />
+      </mat-form-field>
+      <a2ui-composer-badge
+        class="icon-result-count"
+        data-testid="icon-result-count"
+        role="status"
+        aria-live="polite"
+      >
+        {{ resultCountLabel() }}
+      </a2ui-composer-badge>
+    </div>
   </header>
 
   @if (selectedIcon(); as name) {
@@ -41,15 +51,10 @@
         <span class="selected-name">{{ name }}</span>
         <code class="selected-snippet">{{ selectedSnippet() }}</code>
       </div>
-      <button
-        mat-stroked-button
-        class="copy-snippet-button"
-        color="primary"
-        (click)="copySnippet()"
-      >
+      <a2ui-composer-button variant="secondary" class="copy-snippet-button" (click)="copySnippet()">
         <mat-icon aria-hidden="true">content_copy</mat-icon>
         Copy snippet
-      </button>
+      </a2ui-composer-button>
     </section>
   }
 

@@ -111,6 +111,30 @@ describe('WidgetGallery Component', () => {
     expect(await harness.hasRenderedFrame()).toBe(true);
   });
 
+  it('highlights the opened card as selected and opens the side preview panel', async () => {
+    expect(await harness.isCardSelected(0)).toBe(false);
+    expect(await harness.hasPreviewPanel()).toBe(false);
+
+    await harness.clickCard(0);
+    fixture.detectChanges();
+
+    expect(await harness.isCardSelected(0)).toBe(true);
+    expect(await harness.hasPreviewPanel()).toBe(true);
+  });
+
+  it('closes the preview panel and clears selection via the close action', async () => {
+    await harness.clickCard(0);
+    fixture.detectChanges();
+    expect(await harness.isCardSelected(0)).toBe(true);
+
+    await harness.clickClosePreview();
+    fixture.detectChanges();
+
+    expect(await harness.isCardSelected(0)).toBe(false);
+    expect(await harness.hasPreviewPanel()).toBe(false);
+    expect(await harness.hasRenderedFrame()).toBe(false);
+  });
+
   it('dispatches the two-command v0.9 payload to HostCommunication when a card is opened', async () => {
     await harness.clickCard(0);
     fixture.detectChanges();
