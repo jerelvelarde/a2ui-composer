@@ -301,6 +301,11 @@ $dark-theme: mat.define-theme(
   --cpk-space-5: 24px;
   --cpk-space-6: 32px;
 
+  // --- Layout measure ------------------------------------------------
+  // Comfortable reading measure for centred single-column content (e.g. the
+  // settings form), so screens share one width rhythm instead of stray px.
+  --cpk-content-max: 720px;
+
   // --- Radius scale --------------------------------------------------
   --cpk-radius-sm: 4px;
   --cpk-radius-item: 4px;
@@ -408,4 +413,30 @@ body .mat-mdc-slide-toggle .mdc-label {
   white-space: normal !important; /* Forces clean wrapping on narrow viewports */
   line-height: 1.4 !important;
   color: var(--mat-sys-on-surface) !important;
+}
+
+/* Shared action-feedback snackbar (the `Feedback` helper). Themed entirely
+ * through --cpk-* tokens so confirmations read consistently in light and dark.
+ * The CDK overlay mounts at <body>, where `.dark-theme` is stamped, so the
+ * tokens resolve for either mode. A left accent bar keys success vs. error. */
+.cpk-snackbar.mat-mdc-snack-bar-container {
+  --mat-snack-bar-container-color: var(--cpk-surface-elevated);
+  --mat-snack-bar-supporting-text-color: var(--cpk-text-primary);
+  --mat-snack-bar-supporting-text-font: var(--cpk-font-body);
+  --mat-snack-bar-container-shape: var(--cpk-radius-card);
+  --mat-snack-bar-button-color: var(--cpk-accent);
+
+  .mdc-snackbar__surface {
+    border: 1px solid var(--cpk-border);
+    border-left: 3px solid var(--cpk-border);
+    box-shadow: var(--cpk-shadow-elevated);
+  }
+
+  &.cpk-snackbar--success .mdc-snackbar__surface {
+    border-left-color: var(--cpk-success);
+  }
+
+  &.cpk-snackbar--error .mdc-snackbar__surface {
+    border-left-color: var(--cpk-critical);
+  }
 }

@@ -17,9 +17,9 @@
 
 .settings-container {
   // Readable form measure — widened from the stranded 600px column and
-  // centred. No spacing token maps to a container measure, so px is used
-  // here for the layout width only.
-  max-width: 720px;
+  // centred on the shared content-measure token so screens share one width
+  // rhythm.
+  max-width: var(--cpk-content-max);
   margin: 0 auto;
   padding: var(--cpk-space-5);
   display: flex;

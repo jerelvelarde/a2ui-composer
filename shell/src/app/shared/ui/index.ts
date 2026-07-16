@@ -28,3 +28,4 @@ export {EmptyState} from './empty-state/empty-state';
 export {Badge} from './badge/badge';
 export {StatusChip} from './status-chip/status-chip';
 export {SectionLabel} from './section-label/section-label';
+export {Feedback} from './feedback/feedback';

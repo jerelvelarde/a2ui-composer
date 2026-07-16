@@ -17,7 +17,7 @@
 import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {PreviewBridgeMessageType} from 'a2ui-bridge';
-import {Button, Card} from '../../shared/ui';
+import {Button, Card, Feedback} from '../../shared/ui';
 import {RenderedFrame} from '../../preview/rendered/rendered-frame';
 import {HostCommunication} from '../../shell/host-communication/host-communication';
 import {CatalogManagement} from '../../storage/catalog-management/catalog-management';
@@ -50,6 +50,7 @@ export class WidgetGallery {
   private readonly hostCommunication = inject(HostCommunication);
   private readonly catalogManagement = inject(CatalogManagement);
   private readonly widgetLibrary = inject(WidgetLibrary);
+  private readonly feedback = inject(Feedback);
 
   /** The curated finished-widget presets rendered as grid cards. */
   protected readonly presets = WIDGET_GALLERY_PRESETS;
@@ -145,6 +146,7 @@ export class WidgetGallery {
     };
 
     await this.widgetLibrary.add(record);
+    this.feedback.success('Cloned to library');
   }
 
   /**

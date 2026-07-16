@@ -24,7 +24,13 @@ import {HostCommunication} from '../../shell/host-communication/host-communicati
 import {ChatState, LlmLogEntry, LlmLogType} from '../../chat/chat-state/chat-state';
 import {CatalogManagement} from '../../storage/catalog-management/catalog-management';
 import {Catalog} from '../../storage/models/catalog-storage.model';
+import {Feedback} from '../../shared/ui';
 import {signal, WritableSignal} from '@angular/core';
+
+class MockFeedback {
+  success = vi.fn();
+  error = vi.fn();
+}
 
 class MockChatState {
   readonly isProgrammaticStreamActive = signal<boolean>(false);
@@ -92,6 +98,10 @@ describe('RenderedFrame Live Preview Viewport', () => {
         {
           provide: CatalogManagement,
           useValue: catalogManagementMock,
+        },
+        {
+          provide: Feedback,
+          useClass: MockFeedback,
         },
       ],
     }).compileComponents();
@@ -176,6 +186,21 @@ describe('RenderedFrame Live Preview Viewport', () => {
 
     expect(await harness.hasError()).toBe(true);
     expect(await harness.hasIframe()).toBe(false);
+  });
+
+  it('surfaces a failed load through the shared feedback toast, once per failure', async () => {
+    const feedback = TestBed.inject(Feedback) as unknown as MockFeedback;
+    expect(feedback.error).not.toHaveBeenCalled();
+
+    catalogManagementMock.catalogError.set('Watchdog timeout: A2UI_CATALOG not received.');
+    fixture.detectChanges();
+
+    expect(feedback.error).toHaveBeenCalledTimes(1);
+    expect(feedback.error).toHaveBeenCalledWith('Watchdog timeout: A2UI_CATALOG not received.');
+
+    // Staying in the error state must not re-fire the toast on every CD tick.
+    fixture.detectChanges();
+    expect(feedback.error).toHaveBeenCalledTimes(1);
   });
 
   it('re-attempts discovery and remounts the iframe when retry is pressed', async () => {

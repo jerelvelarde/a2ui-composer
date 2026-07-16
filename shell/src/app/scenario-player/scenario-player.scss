@@ -91,9 +91,10 @@
 }
 
 .scenario-timeline {
-  // Fill the panel's remaining height so no dead space strands below the
-  // step list; the list scrolls internally once it outgrows the panel.
-  flex: 1 1 auto;
+  // Hug the step list so no dead bordered space strands below the last step;
+  // the box only grows to its content and scrolls internally once it outgrows
+  // the panel (flex-shrink keeps it bounded).
+  flex: 0 1 auto;
   min-height: 0;
   border: 1px solid var(--cpk-border);
   border-radius: var(--cpk-radius-card);

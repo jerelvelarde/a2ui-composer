@@ -33,6 +33,7 @@ import {CatalogManagement} from '../../storage/catalog-management/catalog-manage
 import {EmptyState} from '../../shared/ui/empty-state/empty-state';
 import {StatusChip} from '../../shared/ui/status-chip/status-chip';
 import {Button} from '../../shared/ui/button/button';
+import {Feedback} from '../../shared/ui/feedback/feedback';
 
 /** Lifecycle a preview surface can occupy while a renderer negotiates. */
 type LoadState = 'empty' | 'loading' | 'ready' | 'error';
@@ -68,6 +69,7 @@ export class RenderedFrame {
   private hostCommunication = inject(HostCommunication);
   private chatState = inject(ChatState);
   private catalogManagement = inject(CatalogManagement);
+  private feedback = inject(Feedback);
 
   /** Programmatic streams active locking Signal, mapping visual lock bounds. */
   protected readonly isLocked = this.chatState.isProgrammaticStreamActive;
@@ -127,7 +129,21 @@ export class RenderedFrame {
     return 'The renderer did not respond in time. Confirm it is running, then retry.';
   });
 
+  /** Prior load lifecycle, so the error toast fires once per failure, not per tick. */
+  private previousLoadState: LoadState = 'empty';
+
   constructor() {
+    // Surface a failed renderer switch/load through the shared feedback helper
+    // the moment the surface enters its error state, complementing the inline
+    // error+retry panel so a failure is never missed if the panel is offscreen.
+    effect(() => {
+      const state = this.loadState();
+      if (state === 'error' && this.previousLoadState !== 'error') {
+        untracked(() => this.feedback.error(this.errorMessage()));
+      }
+      this.previousLoadState = state;
+    });
+
     effect(() => {
       const ref = this.iframeRef();
       if (typeof this.hostCommunication.registerIframeElement === 'function') {

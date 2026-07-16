@@ -22,7 +22,7 @@ import {StateSync} from '../../chat/state-sync/state-sync';
 import {CatalogManagement} from '../../storage/catalog-management/catalog-management';
 import {SectionLabel} from '../../shared/ui/section-label/section-label';
 import {EmptyState} from '../../shared/ui/empty-state/empty-state';
-import {Button} from '../../shared/ui';
+import {Button, Feedback} from '../../shared/ui';
 
 /**
  * Sidebar section that lists the author's persisted widget library and offers a
@@ -42,6 +42,7 @@ export class LibrarySidebar implements OnInit {
   private readonly library = inject(WidgetLibrary);
   private readonly stateSync = inject(StateSync);
   private readonly catalogManagement = inject(CatalogManagement);
+  private readonly feedback = inject(Feedback);
 
   /** Live view of the persisted widget collection. */
   readonly widgets = this.library.widgets;
@@ -82,6 +83,7 @@ export class LibrarySidebar implements OnInit {
       updatedAt: now,
     };
     await this.library.add(record);
+    this.feedback.success('Saved to library');
   }
 
   /**

@@ -34,6 +34,7 @@ import {StartupResolution} from '../startup-resolution/startup-resolution';
 import {HostCommunication} from '../host-communication/host-communication';
 import {ChatState} from '../../chat/chat-state/chat-state';
 import {MessageRole} from '../../chat/llm-client/llm-client';
+import {PipelineStatus} from '../../chat/pipeline-status/pipeline-status';
 import {PreviewBridgeMessageType} from 'a2ui-bridge';
 
 const EVENTS_TAB_INDEX = 1;
@@ -120,6 +121,22 @@ export class ComposerWorkspace implements OnInit {
         if (hasErrors && activeTab !== ERRORS_TAB_INDEX) {
           this.unreadErrorsCount.update(count => count + 1);
         }
+      }
+    });
+
+    // Auto-expand the assistant rail the instant generation/streaming activity
+    // starts, so an in-flight response is never hidden behind the collapsed
+    // rail. This only ever opens the rail — the user keeps full control to
+    // collapse it again — so it does not force the panel permanently open.
+    effect(() => {
+      const status = this.chatState.pipelineStatus();
+      const streaming =
+        this.chatState.isProgrammaticStreamActive() ||
+        (status !== PipelineStatus.IDLE &&
+          status !== PipelineStatus.READY &&
+          status !== PipelineStatus.FAILED);
+      if (streaming && untracked(() => this.isChatCollapsed())) {
+        untracked(() => this.isChatCollapsed.set(false));
       }
     });
 

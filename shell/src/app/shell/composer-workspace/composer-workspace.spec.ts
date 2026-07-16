@@ -179,6 +179,49 @@ describe('ComposerWorkspace Dashboard', () => {
     },
   );
 
+  describe('assistant rail auto-expand on generation activity', () => {
+    it('starts collapsed when there is no conversation yet', () => {
+      expect(fixture.componentInstance.isChatCollapsed()).toBe(true);
+    });
+
+    it('auto-expands the moment a programmatic stream becomes active', () => {
+      const chatState = TestBed.inject(ChatState) as unknown as MockChatState;
+      expect(fixture.componentInstance.isChatCollapsed()).toBe(true);
+
+      chatState.isProgrammaticStreamActive.set(true);
+      TestBed.flushEffects();
+
+      expect(fixture.componentInstance.isChatCollapsed()).toBe(false);
+    });
+
+    it('auto-expands when the pipeline enters a non-terminal streaming status', () => {
+      const chatState = TestBed.inject(ChatState) as unknown as MockChatState;
+      expect(fixture.componentInstance.isChatCollapsed()).toBe(true);
+
+      chatState.pipelineStatus.set(PipelineStatus.RECEIVING_STREAM);
+      TestBed.flushEffects();
+
+      expect(fixture.componentInstance.isChatCollapsed()).toBe(false);
+    });
+
+    it('does not force the rail open once collapsed again while idle', () => {
+      const chatState = TestBed.inject(ChatState) as unknown as MockChatState;
+
+      chatState.isProgrammaticStreamActive.set(true);
+      TestBed.flushEffects();
+      expect(fixture.componentInstance.isChatCollapsed()).toBe(false);
+
+      // Stream ends and the user re-collapses; the effect must not fight back.
+      chatState.isProgrammaticStreamActive.set(false);
+      chatState.pipelineStatus.set(PipelineStatus.READY);
+      TestBed.flushEffects();
+      fixture.componentInstance.toggleChatCollapse();
+      TestBed.flushEffects();
+
+      expect(fixture.componentInstance.isChatCollapsed()).toBe(true);
+    });
+  });
+
   it('delegates clearLogs to all queried child components when clearAllLogs is called', () => {
     const component = fixture.componentInstance;
 

@@ -29,7 +29,13 @@
       }}</mat-icon>
     </button>
     @if (isChatCollapsed()) {
-      <button class="chat-rail" (click)="toggleChatCollapse()" aria-label="Expand assistant">
+      <button
+        class="chat-rail"
+        (click)="toggleChatCollapse()"
+        aria-label="Expand assistant"
+        matTooltip="Expand assistant"
+        matTooltipPosition="right"
+      >
         <mat-icon class="chat-rail__icon" aria-hidden="true">forum</mat-icon>
         <span class="chat-rail__label">Gemini Assistant</span>
       </button>

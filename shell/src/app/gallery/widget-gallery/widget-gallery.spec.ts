@@ -30,6 +30,7 @@ import {StartupResolution} from '../../shell/startup-resolution/startup-resoluti
 import {ChatState} from '../../chat/chat-state/chat-state';
 import {WidgetLibrary} from '../../storage/widget-library/widget-library';
 import {WidgetRecord} from '../../storage/models/widget-storage.model';
+import {Feedback} from '../../shared/ui';
 
 const KNOWN_CATALOG_ID = 'https://a2ui.org/specification/v0_9/basic_catalog.json';
 
@@ -54,6 +55,11 @@ class MockStartupResolution {
 
 class MockChatState {
   readonly isProgrammaticStreamActive = signal<boolean>(false);
+}
+
+class MockFeedback {
+  success = vi.fn();
+  error = vi.fn();
 }
 
 describe('WidgetGallery Component', () => {
@@ -83,6 +89,7 @@ describe('WidgetGallery Component', () => {
         {provide: HostCommunication, useClass: MockHostCommunication},
         {provide: StartupResolution, useClass: MockStartupResolution},
         {provide: ChatState, useClass: MockChatState},
+        {provide: Feedback, useClass: MockFeedback},
       ],
     }).compileComponents();
 
@@ -270,6 +277,14 @@ describe('WidgetGallery Component', () => {
       TestBed.flushEffects();
 
       expect(await harness.hasRenderedFrame()).toBe(false);
+    });
+
+    it('confirms the clone with a "Cloned to library" toast', async () => {
+      const feedback = TestBed.inject(Feedback) as unknown as MockFeedback;
+
+      await harness.clickCloneButton(0);
+      // The toast fires only after the persistence promise resolves.
+      await vi.waitFor(() => expect(feedback.success).toHaveBeenCalledWith('Cloned to library'));
     });
   });
 });

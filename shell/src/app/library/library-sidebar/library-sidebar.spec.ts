@@ -28,6 +28,7 @@ import {WidgetRecord} from '../../storage/models/widget-storage.model';
 import {StateSync} from '../../chat/state-sync/state-sync';
 import {CatalogManagement} from '../../storage/catalog-management/catalog-management';
 import {Catalog} from '../../storage/models/catalog-storage.model';
+import {Feedback} from '../../shared/ui';
 
 function makeWidget(id: string, catalogId = 'catalog-seed'): WidgetRecord {
   return {
@@ -54,6 +55,7 @@ describe('LibrarySidebar', () => {
   let library: WidgetLibrary;
   let activeDraft: WritableSignal<string>;
   let activeCatalog: WritableSignal<Catalog | null>;
+  let feedback: {success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn>};
 
   async function setup(draft: string, catalog: Catalog | null): Promise<void> {
     // Fresh in-memory IndexedDB so the real WidgetLibrary performs a genuine
@@ -66,6 +68,7 @@ describe('LibrarySidebar', () => {
 
     activeDraft = signal(draft);
     activeCatalog = signal(catalog);
+    feedback = {success: vi.fn(), error: vi.fn()};
 
     TestBed.configureTestingModule({
       imports: [LibrarySidebar],
@@ -73,6 +76,7 @@ describe('LibrarySidebar', () => {
         provideNoopAnimations(),
         {provide: StateSync, useValue: {activeDraft: activeDraft.asReadonly()}},
         {provide: CatalogManagement, useValue: {activeCatalog: activeCatalog.asReadonly()}},
+        {provide: Feedback, useValue: feedback},
       ],
     });
 
@@ -161,6 +165,9 @@ describe('LibrarySidebar', () => {
       const persisted = await library.get(all[0].id);
       expect(persisted).not.toBeNull();
       expect(await harness.getWidgetCount()).toBe(1);
+
+      // The save confirms itself through the shared feedback helper.
+      expect(feedback.success).toHaveBeenCalledWith('Saved to library');
     });
 
     it('does not mutate the working draft when saving (read-only w.r.t. the draft)', async () => {
@@ -226,6 +233,8 @@ describe('LibrarySidebar', () => {
       expect(addSpy).not.toHaveBeenCalled();
       expect(await library.getAll()).toHaveLength(0);
       expect(await harness.getWidgetCount()).toBe(0);
+      // A no-op save must not emit a phantom confirmation toast.
+      expect(feedback.success).not.toHaveBeenCalled();
     });
 
     it('treats a whitespace-only draft as absent and writes no record', async () => {
