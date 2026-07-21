@@ -36,8 +36,35 @@ export const routes: Routes = [
       {
         path: 'gallery',
         loadComponent: () => import('./gallery/gallery').then(m => m.Gallery),
-        title: 'A2UI Components Gallery',
+        title: 'A2UI Gallery',
+        // No startupGuard: renders natively via @a2ui/angular, not the iframe renderer.
+      },
+      {
+        path: 'basic-catalog',
+        loadComponent: () =>
+          import('./basic-catalog/basic-catalog').then(m => m.BasicCatalogView),
+        title: 'A2UI Basic Catalog',
         canActivate: [startupGuard],
+      },
+      {
+        path: 'custom-catalog',
+        loadComponent: () =>
+          import('./custom-catalog/assembled/custom-catalog').then(m => m.CustomCatalog),
+        title: 'A2UI Custom Catalog',
+        // No startupGuard: renders natively via @a2ui/angular, not the iframe renderer.
+      },
+      {
+        path: 'catalog-reference',
+        loadComponent: () =>
+          import('./custom-catalog/reference/catalog-reference').then(m => m.CatalogReference),
+        title: 'A2UI Catalog Reference',
+        // No startupGuard: renders natively via @a2ui/angular, not the iframe renderer.
+      },
+      {
+        path: 'theater',
+        loadComponent: () => import('./theater/theater').then(m => m.Theater),
+        title: 'A2UI Theater',
+        // No startupGuard: renders natively via @a2ui/angular, not the iframe renderer.
       },
       {
         path: 'settings',
