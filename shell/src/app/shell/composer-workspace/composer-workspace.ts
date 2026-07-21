@@ -31,10 +31,10 @@ import {
   Type,
 } from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {MatButtonModule} from '@angular/material/button';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {ChatPanel} from '../../chat/chat-panel/chat-panel';
 import {RawFrame} from '../../preview/raw/raw-frame';
 import {RenderedFrame} from '../../preview/rendered/rendered-frame';
 import {DataModel} from '../../debug/data-model/data-model';
@@ -46,6 +46,9 @@ import {StartupResolution} from '../startup-resolution/startup-resolution';
 import {HostCommunication} from '../host-communication/host-communication';
 import {PreviewBridgeMessageType} from 'a2ui-bridge';
 import {AppConfigProvider} from '../../settings/app-config-provider/app-config-provider';
+import {ChatState} from '../../chat/chat-state/chat-state';
+import {PipelineStatus} from '../../chat/pipeline-status/pipeline-status';
+import {CopilotSidebar} from '../../copilotkit/copilot-sidebar/copilot-sidebar';
 import {DockviewComponent} from 'dockview';
 
 /** Internal interface mapping raw cross-frame workspace telemetry payloads */
@@ -69,7 +72,7 @@ export enum ComposerPanelId {
 }
 
 /** Named workspace layout presets selectable from the panel-setup switcher. */
-export type WorkspacePreset = 'chat' | 'chat-preview' | 'full';
+export type WorkspacePreset = 'preview' | 'preview-code' | 'full';
 
 /** localStorage key remembering the last-applied preset (for the toggle highlight). */
 const WORKSPACE_PRESET_KEY = 'composer_workspace_preset';
@@ -81,7 +84,7 @@ const WORKSPACE_PRESET_KEY = 'composer_workspace_preset';
 @Component({
   selector: 'a2ui-composer-workspace',
   standalone: true,
-  imports: [MatButtonToggleModule, MatIconModule, MatTooltipModule],
+  imports: [CopilotSidebar, MatButtonModule, MatButtonToggleModule, MatIconModule, MatTooltipModule],
   templateUrl: './composer-workspace.ng.html',
   styleUrl: './composer-workspace.scss',
 })
@@ -91,6 +94,7 @@ export class ComposerWorkspace implements OnInit, AfterViewInit {
   private hostComm = inject(HostCommunication);
   private viewContainerRef = inject(ViewContainerRef);
   private configProvider = inject(AppConfigProvider);
+  private chatState = inject(ChatState);
 
   readonly dockviewRoot = viewChild.required<ElementRef<HTMLElement>>('dockviewRoot');
 
@@ -100,8 +104,17 @@ export class ComposerWorkspace implements OnInit, AfterViewInit {
   unreadErrorsCount = signal(0);
   isDarkTheme = computed(() => this.configProvider.themePreference() === 'dark');
 
+  /** Whether the on-demand A2UI JSON editor ("source") panel is open. */
+  readonly isSourceOpen = signal(false);
+
+  /** Guards the first-READY auto-reveal so it fires at most once. */
+  private hasAutoRevealedSource = false;
+
+  /** Set once the user opens/closes source manually, suppressing auto-reveal. */
+  private userToggledSource = false;
+
   /** The workspace layout preset currently applied (drives the switcher highlight). */
-  readonly activePreset = signal<WorkspacePreset>('chat-preview');
+  readonly activePreset = signal<WorkspacePreset>('preview');
 
   private readonly isDockviewInitialized = signal(false);
   private dockviewApi!: DockviewComponent;
@@ -201,6 +214,22 @@ export class ComposerWorkspace implements OnInit, AfterViewInit {
         api.updateOptions({className: isDark ? 'dockview-theme-dark' : 'dockview-theme-light'});
       }
     });
+
+    // Auto-reveal the A2UI JSON editor the first time a generation completes
+    // (pipeline reaches READY). Fires at most once, and never if the user has
+    // already toggled the source panel themselves.
+    effect(() => {
+      const status = this.chatState.pipelineStatus();
+      const initialized = this.isDockviewInitialized();
+      if (!initialized || status !== PipelineStatus.READY) return;
+      untracked(() => {
+        if (this.hasAutoRevealedSource || this.userToggledSource) return;
+        this.hasAutoRevealedSource = true;
+        if (!this.dockviewApi.getGroupPanel(ComposerPanelId.Raw)) {
+          this.addRawPanel();
+        }
+      });
+    });
   }
 
   ngOnInit(): void {
@@ -215,9 +244,6 @@ export class ComposerWorkspace implements OnInit, AfterViewInit {
       createComponent: options => {
         let type: Type<unknown> | undefined;
         switch (options.name as ComposerPanelId) {
-          case ComposerPanelId.Chat:
-            type = ChatPanel;
-            break;
           case ComposerPanelId.Rendered:
             type = RenderedFrame;
             break;
@@ -297,9 +323,12 @@ export class ComposerWorkspace implements OnInit, AfterViewInit {
     }
 
     if (!layoutRestored) {
-      // Fresh workspace opens on the "Chat + Preview" preset (focus on render)
-      // rather than the full debug layout. Users switch via the preset toolbar.
-      this.buildChatPreviewLayout();
+      // Fresh workspace opens on the "Preview" preset — just the rendered
+      // output. Chat lives in the docked CopilotKit sidebar (a Dockview
+      // sibling), and the A2UI JSON editor is hidden until the user opens it or
+      // the first generation completes (see the auto-reveal effect +
+      // toggleSource()). Other arrangements are reachable via the preset switcher.
+      this.buildPreviewLayout();
     }
 
     let saveTimeout: ReturnType<typeof setTimeout>;
@@ -310,8 +339,14 @@ export class ComposerWorkspace implements OnInit, AfterViewInit {
         localStorage.setItem('composer_dockview_layout', JSON.stringify(this.dockviewApi.toJSON()));
       }, 1000);
     });
-    this.dockviewApi.onDidAddPanel(() => this.checkTabOverflow());
-    this.dockviewApi.onDidRemovePanel(() => this.checkTabOverflow());
+    this.dockviewApi.onDidAddPanel(panel => {
+      if (panel.id === ComposerPanelId.Raw) this.isSourceOpen.set(true);
+      this.checkTabOverflow();
+    });
+    this.dockviewApi.onDidRemovePanel(panel => {
+      if (panel.id === ComposerPanelId.Raw) this.isSourceOpen.set(false);
+      this.checkTabOverflow();
+    });
 
     this.resizeObserver = new ResizeObserver(() => this.checkTabOverflow());
     this.resizeObserver.observe(this.dockviewRoot().nativeElement);
@@ -319,14 +354,16 @@ export class ComposerWorkspace implements OnInit, AfterViewInit {
     // Force an initial layout pass. In browsers, ResizeObserver handles this,
     // but in jsdom tests with mocked observers, it requires an explicit call.
     this.dockviewApi.layout(1000, 1000);
+    // Sync the source toggle with whatever the (possibly restored) layout holds.
+    this.isSourceOpen.set(!!this.dockviewApi.getGroupPanel(ComposerPanelId.Raw));
     this.isDockviewInitialized.set(true);
     this.checkTabOverflow();
 
-    // Highlight the toggle matching the last-applied preset. The layout itself
-    // is Google's saved freeform JSON when present, so the toggle is a hint of
-    // the last chosen arrangement, not a guarantee the layout still matches it.
+    // Highlight the toggle matching the last-applied preset. A restored layout
+    // is Dockview's saved freeform JSON when present, so the toggle is a hint of
+    // the last chosen arrangement, not a guarantee it still matches.
     const savedPreset = localStorage.getItem(WORKSPACE_PRESET_KEY);
-    if (savedPreset === 'chat' || savedPreset === 'chat-preview' || savedPreset === 'full') {
+    if (savedPreset === 'preview' || savedPreset === 'preview-code' || savedPreset === 'full') {
       this.activePreset.set(savedPreset);
     }
   }
@@ -335,15 +372,16 @@ export class ComposerWorkspace implements OnInit, AfterViewInit {
    * Applies a named layout preset: clears the workspace and rebuilds it with the
    * preset's panel subset. Dockview's debounced layout-save then records the
    * result, so a reload restores it (freeform edits included). No-op until the
-   * Dockview instance is initialized.
+   * Dockview instance is initialized. Chat is unaffected — it lives in the
+   * docked sidebar, not a Dockview panel.
    */
   applyPreset(preset: WorkspacePreset): void {
     if (!this.isDockviewInitialized()) return;
     this.dockviewApi.clear();
-    if (preset === 'chat') {
-      this.buildChatLayout();
-    } else if (preset === 'chat-preview') {
-      this.buildChatPreviewLayout();
+    if (preset === 'preview') {
+      this.buildPreviewLayout();
+    } else if (preset === 'preview-code') {
+      this.buildPreviewCodeLayout();
     } else {
       this.buildFullLayout();
     }
@@ -351,39 +389,28 @@ export class ComposerWorkspace implements OnInit, AfterViewInit {
     localStorage.setItem(WORKSPACE_PRESET_KEY, preset);
   }
 
-  /** Preset "Chat": conversation only. */
-  private buildChatLayout(): void {
-    this.dockviewApi.addPanel({
-      id: ComposerPanelId.Chat,
-      component: ComposerPanelId.Chat,
-      title: 'Gemini Assistant',
-    });
-  }
-
-  /** Preset "Chat + Preview": conversation beside the live render (default focus). */
-  private buildChatPreviewLayout(): void {
-    this.buildChatLayout();
+  /** Preset "Preview": the rendered A2UI output on its own. */
+  private buildPreviewLayout(): void {
     this.dockviewApi.addPanel({
       id: ComposerPanelId.Rendered,
       component: ComposerPanelId.Rendered,
       title: 'Rendered A2UI Preview',
-      position: {direction: 'right', referencePanel: ComposerPanelId.Chat},
     });
   }
 
+  /** Preset "Preview + Code": rendered output beside the A2UI JSON editor. */
+  private buildPreviewCodeLayout(): void {
+    this.buildPreviewLayout();
+    this.addRawPanel();
+  }
+
   /**
-   * Preset "Chat + Preview + Code & Engine": the full workspace — chat, render,
-   * JSON editor, and the data-model / events / errors / raw-messages consoles.
-   * This is Google's original default layout.
+   * Preset "Full": rendered output, the JSON editor, and the data-model /
+   * events / errors / raw-messages debug consoles (plus mock rules when
+   * enabled) — Google's original workspace minus the chat panel.
    */
   private buildFullLayout(): void {
-    this.buildChatPreviewLayout();
-    this.dockviewApi.addPanel({
-      id: ComposerPanelId.Raw,
-      component: ComposerPanelId.Raw,
-      title: 'A2UI JSON Editor',
-      position: {direction: 'right', referencePanel: ComposerPanelId.Rendered},
-    });
+    this.buildPreviewCodeLayout();
     this.dockviewApi.addPanel({
       id: ComposerPanelId.DataModel,
       component: ComposerPanelId.DataModel,
@@ -416,6 +443,37 @@ export class ComposerWorkspace implements OnInit, AfterViewInit {
         title: 'Mock Rules',
         position: {direction: 'within', referencePanel: ComposerPanelId.DataModel},
       });
+    }
+  }
+
+  /**
+   * Adds the A2UI JSON editor ("Raw") panel to the right of the rendered
+   * preview, tolerating layouts where that reference panel is absent.
+   */
+  private addRawPanel(): void {
+    const rendered = this.dockviewApi.getGroupPanel(ComposerPanelId.Rendered);
+    this.dockviewApi.addPanel({
+      id: ComposerPanelId.Raw,
+      component: ComposerPanelId.Raw,
+      title: 'A2UI JSON Editor',
+      ...(rendered
+        ? {position: {direction: 'right', referencePanel: ComposerPanelId.Rendered}}
+        : {}),
+    });
+  }
+
+  /**
+   * Reveals or hides the on-demand A2UI JSON editor panel. Marks the source
+   * panel as user-controlled so the first-READY auto-reveal no longer fires.
+   */
+  toggleSource(): void {
+    if (!this.isDockviewInitialized()) return;
+    this.userToggledSource = true;
+    const existing = this.dockviewApi.getGroupPanel(ComposerPanelId.Raw);
+    if (existing) {
+      existing.api.close();
+    } else {
+      this.addRawPanel();
     }
   }
 

@@ -15,35 +15,45 @@
 -->
 
 <div class="workspace-container" [class.extension-mode]="isExtension()">
-  <div class="workspace-toolbar">
-    <mat-button-toggle-group
-      class="preset-switcher"
-      [value]="activePreset()"
-      (change)="applyPreset($event.value)"
-      aria-label="Workspace layout preset"
-      hideSingleSelectionIndicator
-    >
-      <mat-button-toggle value="chat" matTooltip="Chat only">
-        <mat-icon aria-hidden="true">forum</mat-icon>
-        <span class="preset-label">Chat</span>
-      </mat-button-toggle>
-      <mat-button-toggle value="chat-preview" matTooltip="Chat + live preview">
-        <mat-icon aria-hidden="true">preview</mat-icon>
-        <span class="preset-label">Chat + Preview</span>
-      </mat-button-toggle>
-      <mat-button-toggle
-        value="full"
-        matTooltip="Chat, preview, JSON editor + data/engine panels"
+  <a2ui-composer-copilot-sidebar />
+  <div class="dockview-region">
+    <div class="dockview-toolbar">
+      <mat-button-toggle-group
+        class="preset-switcher"
+        [value]="activePreset()"
+        (change)="applyPreset($event.value)"
+        aria-label="Workspace layout preset"
+        hideSingleSelectionIndicator
       >
-        <mat-icon aria-hidden="true">dashboard</mat-icon>
-        <span class="preset-label">Code &amp; Engine</span>
-      </mat-button-toggle>
-    </mat-button-toggle-group>
+        <mat-button-toggle value="preview" matTooltip="Rendered preview only">
+          <mat-icon aria-hidden="true">preview</mat-icon>
+          <span class="preset-label">Preview</span>
+        </mat-button-toggle>
+        <mat-button-toggle value="preview-code" matTooltip="Preview + A2UI JSON editor">
+          <mat-icon aria-hidden="true">code</mat-icon>
+          <span class="preset-label">Preview + Code</span>
+        </mat-button-toggle>
+        <mat-button-toggle value="full" matTooltip="Preview, JSON editor + data/engine panels">
+          <mat-icon aria-hidden="true">dashboard</mat-icon>
+          <span class="preset-label">Full</span>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+      <button
+        mat-stroked-button
+        type="button"
+        class="source-toggle"
+        [attr.aria-pressed]="isSourceOpen()"
+        (click)="toggleSource()"
+      >
+        <mat-icon>{{ isSourceOpen() ? 'code_off' : 'code' }}</mat-icon>
+        {{ isSourceOpen() ? 'Hide source' : 'Show source' }}
+      </button>
+    </div>
+    <div
+      #dockviewRoot
+      class="dockview-root mat-m3-dockview-tabs"
+      [class.dockview-theme-dark]="isDarkTheme()"
+      [class.dockview-theme-light]="!isDarkTheme()"
+    ></div>
   </div>
-  <div
-    #dockviewRoot
-    class="dockview-root mat-m3-dockview-tabs"
-    [class.dockview-theme-dark]="isDarkTheme()"
-    [class.dockview-theme-light]="!isDarkTheme()"
-  ></div>
 </div>
