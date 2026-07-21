@@ -26,6 +26,42 @@ if (typeof window !== 'undefined' && (!window.crypto || !window.crypto.subtle)) 
   });
 }
 
+// jsdom implements neither constructable stylesheets (`new CSSStyleSheet()` +
+// `replaceSync`) nor `document.adoptedStyleSheets`, both used by the @a2ui
+// basic catalog's global style injection. Polyfill enough for it to succeed
+// (real browsers already support these — the Gallery is verified there).
+if (typeof document !== 'undefined') {
+  let ctorOk = false;
+  try {
+    ctorOk = typeof new CSSStyleSheet().replaceSync === 'function';
+  } catch {
+    ctorOk = false;
+  }
+  if (!ctorOk) {
+    class MockCSSStyleSheet {
+      replaceSync(): void {}
+      replace(): Promise<this> {
+        return Promise.resolve(this);
+      }
+    }
+    Object.defineProperty(globalThis, 'CSSStyleSheet', {
+      value: MockCSSStyleSheet,
+      writable: true,
+      configurable: true,
+    });
+  }
+  if (!('adoptedStyleSheets' in document)) {
+    let sheets: unknown[] = [];
+    Object.defineProperty(document, 'adoptedStyleSheets', {
+      get: () => sheets,
+      set: (value: unknown[]) => {
+        sheets = value;
+      },
+      configurable: true,
+    });
+  }
+}
+
 if (!getTestBed().platform) {
   getTestBed().initTestEnvironment(BrowserTestingModule, platformBrowserTesting());
 }

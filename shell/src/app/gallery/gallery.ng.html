@@ -1,0 +1,36 @@
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<div class="gal-page">
+  <header class="gal-header">
+    <h1 class="gal-title">Gallery</h1>
+    <p class="gal-subtitle">
+      Composed example widgets from the A2UI basic catalog, each rendered live on its own native
+      surface.
+    </p>
+  </header>
+
+  <div class="gal-masonry">
+    @for (entry of widgets; track entry.widget.id) {
+      <figure class="gal-card">
+        <figcaption class="gal-caption">{{ entry.widget.name }}</figcaption>
+        <div class="gal-surface" [style.min-height.px]="entry.height">
+          <a2ui-v09-surface [surfaceId]="entry.widget.id"></a2ui-v09-surface>
+        </div>
+      </figure>
+    }
+  </div>
+</div>
