@@ -40,13 +40,6 @@ export const routes: Routes = [
         canActivate: [startupGuard],
       },
       {
-        path: 'widget-gallery',
-        loadComponent: () =>
-          import('./gallery/widget-gallery/widget-gallery').then(m => m.WidgetGallery),
-        title: 'A2UI Widget Gallery',
-        canActivate: [startupGuard],
-      },
-      {
         path: 'scenario-player',
         loadComponent: () =>
           import('./scenario-player/scenario-player').then(m => m.ScenarioPlayer),

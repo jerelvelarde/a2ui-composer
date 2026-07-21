@@ -33,7 +33,6 @@ import {AppConfigProvider} from '../../settings/app-config-provider/app-config-p
 import {LocalStorageKey} from '../../storage/models/local-storage-keys';
 import {LocalStorageInteractions} from '../../storage/local-storage-interactions/local-storage-interactions';
 import {SessionStorageInteractions} from '../../storage/session-storage-interactions/session-storage-interactions';
-import {LibrarySidebar} from '../../library/library-sidebar/library-sidebar';
 import {Badge} from '../../shared/ui/badge/badge';
 import {Button} from '../../shared/ui/button/button';
 import {SectionLabel} from '../../shared/ui/section-label/section-label';
@@ -62,7 +61,6 @@ const NARROW_BREAKPOINT = '(max-width: 768px)';
     RouterLinkActive,
     MatTooltipModule,
     RendererPicker,
-    LibrarySidebar,
     Badge,
     Button,
     SectionLabel,

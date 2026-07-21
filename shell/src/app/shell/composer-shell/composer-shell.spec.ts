@@ -29,9 +29,6 @@ import {signal, WritableSignal} from '@angular/core';
 import {LocalStorageInteractions} from '../../storage/local-storage-interactions/local-storage-interactions';
 import {LocalStorageKey} from '../../storage/models/local-storage-keys';
 import {SessionStorageInteractions} from '../../storage/session-storage-interactions/session-storage-interactions';
-import {WidgetLibrary} from '../../storage/widget-library/widget-library';
-import {StateSync} from '../../chat/state-sync/state-sync';
-import {WidgetRecord} from '../../storage/models/widget-storage.model';
 
 describe('ComposerShell Layout', () => {
   let fixture: ComponentFixture<ComposerShell>;
@@ -44,12 +41,6 @@ describe('ComposerShell Layout', () => {
     activeCatalogDescription: WritableSignal<string>;
     activeCatalog: WritableSignal<null>;
   };
-  let widgetLibraryMock: {
-    widgets: WritableSignal<readonly WidgetRecord[]>;
-    getAll: () => Promise<WidgetRecord[]>;
-    add: () => Promise<void>;
-  };
-  let stateSyncMock: {activeDraft: WritableSignal<string>};
   let configProviderMock: {
     themePreference: WritableSignal<'light' | 'dark'>;
     setThemePreference: (theme: 'light' | 'dark') => void;
@@ -72,16 +63,6 @@ describe('ComposerShell Layout', () => {
       activeCatalogTitle: signal(''),
       activeCatalogDescription: signal(''),
       activeCatalog: signal(null),
-    };
-
-    widgetLibraryMock = {
-      widgets: signal<readonly WidgetRecord[]>([]),
-      getAll: vi.fn().mockResolvedValue([]),
-      add: vi.fn().mockResolvedValue(undefined),
-    };
-
-    stateSyncMock = {
-      activeDraft: signal(''),
     };
 
     configProviderMock = {
@@ -115,14 +96,6 @@ describe('ComposerShell Layout', () => {
         {
           provide: AppConfigProvider,
           useValue: configProviderMock,
-        },
-        {
-          provide: WidgetLibrary,
-          useValue: widgetLibraryMock,
-        },
-        {
-          provide: StateSync,
-          useValue: stateSyncMock,
         },
       ],
     }).compileComponents();
