@@ -34,6 +34,12 @@ export const routes: Routes = [
         canActivate: [startupGuard],
       },
       {
+        path: 'gallery',
+        loadComponent: () => import('./gallery/gallery').then(m => m.Gallery),
+        title: 'A2UI Gallery',
+        // No startupGuard: renders natively via @a2ui/angular, not the iframe renderer.
+      },
+      {
         path: 'basic-catalog',
         loadComponent: () =>
           import('./basic-catalog/basic-catalog').then(m => m.BasicCatalogView),

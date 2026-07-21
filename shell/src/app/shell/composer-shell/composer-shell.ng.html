@@ -82,15 +82,30 @@
         mat-list-item
         routerLink="/gallery"
         routerLinkActive="active-nav-item"
-        aria-label="Components Gallery"
-        matTooltip="Components Gallery"
+        aria-label="Gallery"
+        matTooltip="Gallery"
+        matTooltipPosition="right"
+        [matTooltipDisabled]="!isCollapsed()"
+        (click)="ensureCollapsed()"
+      >
+        <mat-icon matListItemIcon aria-hidden="true">grid_view</mat-icon>
+        @if (!isCollapsed()) {
+          <span class="nav-label">Gallery</span>
+        }
+      </a>
+      <a
+        mat-list-item
+        routerLink="/basic-catalog"
+        routerLinkActive="active-nav-item"
+        aria-label="Basic Catalog"
+        matTooltip="Basic Catalog"
         matTooltipPosition="right"
         [matTooltipDisabled]="!isCollapsed()"
         (click)="ensureCollapsed()"
       >
         <mat-icon matListItemIcon aria-hidden="true">widgets</mat-icon>
         @if (!isCollapsed()) {
-          <span class="nav-label">Components Gallery</span>
+          <span class="nav-label">Basic Catalog</span>
         }
       </a>
       <a
