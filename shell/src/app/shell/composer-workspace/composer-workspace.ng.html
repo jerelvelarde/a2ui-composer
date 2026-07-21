@@ -15,7 +15,9 @@
 -->
 
 <div class="workspace-container" [class.extension-mode]="isExtension()">
-  <a2ui-composer-copilot-sidebar />
+  <!-- CopilotKit's chat styles theme via a `.dark` ancestor; bridge the composer's
+       dark mode to it so the sidebar matches the shell instead of staying light. -->
+  <a2ui-composer-copilot-sidebar [class.dark]="isDarkTheme()" />
   <div class="dockview-region">
     <div class="dockview-toolbar">
       <mat-button-toggle-group
