@@ -28,3 +28,28 @@ body {
 *:after {
   box-sizing: inherit;
 }
+
+/* Thin, unobtrusive scrollbar so the A2UI preview matches the composer's themed
+ * scrollbars instead of showing a chunky default bar in the preview pane. This
+ * document renders light (color-scheme: light), so the thumb is a subtle dark
+ * translucent fill. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.28) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.28);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
