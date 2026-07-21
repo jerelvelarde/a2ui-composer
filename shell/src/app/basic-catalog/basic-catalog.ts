@@ -49,7 +49,7 @@ type GalleryView = 'components' | 'definition';
  * schema properties introspection, live preview placeholders, and usage clipboard exports.
  */
 @Component({
-  selector: 'a2ui-composer-gallery',
+  selector: 'a2ui-composer-basic-catalog',
   standalone: true,
   imports: [
     JsonPipe,
@@ -64,11 +64,11 @@ type GalleryView = 'components' | 'definition';
     RenderedFrame,
     MonacoEditor,
   ],
-  templateUrl: './gallery.ng.html',
-  styleUrl: './gallery.scss',
+  templateUrl: './basic-catalog.ng.html',
+  styleUrl: './basic-catalog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Gallery implements OnInit, OnDestroy {
+export class BasicCatalogView implements OnInit, OnDestroy {
   private readonly catalogService = inject(GalleryCatalog);
   protected readonly catalogManagement = inject(CatalogManagement);
   private readonly hostCommunication = inject(HostCommunication);

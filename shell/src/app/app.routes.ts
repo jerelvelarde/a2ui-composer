@@ -34,9 +34,10 @@ export const routes: Routes = [
         canActivate: [startupGuard],
       },
       {
-        path: 'gallery',
-        loadComponent: () => import('./gallery/gallery').then(m => m.Gallery),
-        title: 'A2UI Components Gallery',
+        path: 'basic-catalog',
+        loadComponent: () =>
+          import('./basic-catalog/basic-catalog').then(m => m.BasicCatalogView),
+        title: 'A2UI Basic Catalog',
         canActivate: [startupGuard],
       },
       {

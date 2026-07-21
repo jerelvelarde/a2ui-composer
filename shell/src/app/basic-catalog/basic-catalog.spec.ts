@@ -19,7 +19,7 @@ import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {Component, input, output, signal} from '@angular/core';
 import {describe, it, expect, beforeEach, afterEach, vi} from 'vitest';
-import {Gallery} from './gallery';
+import {BasicCatalogView} from './basic-catalog';
 import {MonacoEditor} from '../shared/monaco-editor/monaco-editor';
 
 // Stub the Monaco editor (the Definition view): the real one injects
@@ -86,8 +86,8 @@ class MockChatState {
   readonly isProgrammaticStreamActive = signal<boolean>(false);
 }
 
-describe('Gallery Component', () => {
-  let fixture: ComponentFixture<Gallery>;
+describe('BasicCatalogView Component', () => {
+  let fixture: ComponentFixture<BasicCatalogView>;
   let harness: GalleryHarness;
   let catalogServiceMock: MockGalleryCatalogService;
   let catalogManagementMock: MockCatalogManagement;
@@ -97,7 +97,7 @@ describe('Gallery Component', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Gallery],
+      imports: [BasicCatalogView],
       providers: [
         provideNoopAnimations(),
         {provide: GalleryCatalog, useClass: MockGalleryCatalogService},
@@ -107,13 +107,13 @@ describe('Gallery Component', () => {
         {provide: ChatState, useClass: MockChatState},
       ],
     })
-      .overrideComponent(Gallery, {
+      .overrideComponent(BasicCatalogView, {
         remove: {imports: [MonacoEditor]},
         add: {imports: [MonacoEditorStub]},
       })
       .compileComponents();
 
-    fixture = TestBed.createComponent(Gallery);
+    fixture = TestBed.createComponent(BasicCatalogView);
     fixture.detectChanges();
     harness = await TestbedHarnessEnvironment.harnessForFixture(fixture, GalleryHarness);
 
