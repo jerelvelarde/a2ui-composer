@@ -14,6 +14,7 @@
     "e2e-headless": "E2E_HEADLESS=true playwright test",
     "prettier": "prettier --ignore-path ../.prettierignore --write . | grep -v '(unchanged)'",
     "clean": "rm -rf dist .angular node_modules/.vite",
+    "generate:catalog-source": "node scripts/generate-catalog-source.mjs",
     "lint": "eslint ."
   },
   "dependencies": {
