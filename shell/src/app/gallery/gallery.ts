@@ -20,6 +20,8 @@ import {
   computed,
   effect,
   inject,
+  signal,
+  untracked,
   OnInit,
   OnDestroy,
 } from '@angular/core';
@@ -29,13 +31,18 @@ import {MatListModule} from '@angular/material/list';
 import {MatCardModule} from '@angular/material/card';
 import {MatTableModule} from '@angular/material/table';
 import {MatButtonModule} from '@angular/material/button';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatIconModule} from '@angular/material/icon';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {GalleryCatalog} from './services/gallery-catalog';
 import {CatalogManagement} from '../storage/catalog-management/catalog-management';
 import {RenderedFrame} from '../preview/rendered/rendered-frame';
 import {HostCommunication} from '../shell/host-communication/host-communication';
+import {MonacoEditor} from '../shared/monaco-editor/monaco-editor';
 import {formatJson} from '../utils/json';
+
+/** Which face of the gallery is showing: the component reference or the raw catalog definition. */
+type GalleryView = 'components' | 'definition';
 
 /**
  * Displays a split visual catalog gallery enabling search, interactive component selection,
@@ -51,9 +58,11 @@ import {formatJson} from '../utils/json';
     MatCardModule,
     MatTableModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatIconModule,
     MatProgressSpinnerModule,
     RenderedFrame,
+    MonacoEditor,
   ],
   templateUrl: './gallery.ng.html',
   styleUrl: './gallery.scss',
@@ -113,6 +122,32 @@ export class Gallery implements OnInit, OnDestroy {
         console.error('Failed to parse component usage JSON:', e);
       }
     });
+
+    // Preselect the first component once a catalog resolves so the gallery opens
+    // on a populated detail view rather than a dead "No Component Selected" screen.
+    // Guarded on an empty selection so a user's later deselection is respected.
+    effect(() => {
+      const groups = this.componentsList();
+      if (untracked(() => this.selectedComponentKey())) return;
+      const firstComponent = groups.find(g => g.components.length > 0)?.components[0];
+      if (firstComponent) {
+        untracked(() => this.selectComponent(firstComponent));
+      }
+    });
+  }
+
+  /** Which face of the gallery is showing (component reference vs raw catalog definition). */
+  protected readonly viewMode = signal<GalleryView>('components');
+
+  /** The active catalog serialized for the read-only "Definition" view. */
+  protected readonly catalogDefinition = computed<string>(() => {
+    const catalog = this.catalogManagement.activeCatalog();
+    return catalog ? formatJson(catalog) : '';
+  });
+
+  /** Switches between the component reference and the catalog-definition view. */
+  protected setViewMode(mode: GalleryView): void {
+    this.viewMode.set(mode);
   }
 
   ngOnInit(): void {

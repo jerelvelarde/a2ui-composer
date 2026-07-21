@@ -17,9 +17,20 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
-import {signal} from '@angular/core';
+import {Component, input, output, signal} from '@angular/core';
 import {describe, it, expect, beforeEach, afterEach, vi} from 'vitest';
 import {Gallery} from './gallery';
+import {MonacoEditor} from '../shared/monaco-editor/monaco-editor';
+
+// Stub the Monaco editor (the Definition view): the real one injects
+// AppConfigProvider and loads the Monaco AMD bundle in afterNextRender, neither
+// of which is available/desirable under jsdom.
+@Component({selector: 'a2ui-composer-monaco-editor', standalone: true, template: ''})
+class MonacoEditorStub {
+  readonly value = input<string>('');
+  readonly readOnly = input<boolean>(false);
+  readonly valueChange = output<string>();
+}
 import {GalleryHarness} from './test/gallery.harness';
 import {GalleryCatalog, CategorizedComponents} from './services/gallery-catalog';
 import {type ComponentUsage} from 'a2ui-bridge';
@@ -95,7 +106,12 @@ describe('Gallery Component', () => {
         {provide: StartupResolution, useClass: MockStartupResolution},
         {provide: ChatState, useClass: MockChatState},
       ],
-    }).compileComponents();
+    })
+      .overrideComponent(Gallery, {
+        remove: {imports: [MonacoEditor]},
+        add: {imports: [MonacoEditorStub]},
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(Gallery);
     fixture.detectChanges();
@@ -774,5 +790,39 @@ describe('Gallery Component', () => {
         },
       },
     ]);
+  });
+
+  it('auto-selects the first component when a catalog resolves and none is selected', async () => {
+    catalogServiceMock.selectedComponentKey.set(null);
+    catalogServiceMock.componentsList.set([{category: 'Layout', components: ['Row', 'Column']}]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(catalogServiceMock.selectComponent).toHaveBeenCalledWith('Row');
+    expect(catalogServiceMock.selectedComponentKey()).toBe('Row');
+  });
+
+  it('does not override an existing selection when the component list changes', async () => {
+    catalogServiceMock.selectedComponentKey.set('Column');
+    catalogServiceMock.selectComponent.mockClear();
+    catalogServiceMock.componentsList.set([{category: 'Layout', components: ['Row', 'Column']}]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(catalogServiceMock.selectComponent).not.toHaveBeenCalled();
+    expect(catalogServiceMock.selectedComponentKey()).toBe('Column');
+  });
+
+  it('exposes the active catalog JSON for the definition view and toggles view mode', () => {
+    const component = fixture.componentInstance as unknown as {
+      viewMode: () => string;
+      setViewMode: (m: string) => void;
+      catalogDefinition: () => string;
+    };
+    expect(component.viewMode()).toBe('components');
+    expect(component.catalogDefinition()).toContain('default_catalog.json');
+
+    component.setViewMode('definition');
+    expect(component.viewMode()).toBe('definition');
   });
 });

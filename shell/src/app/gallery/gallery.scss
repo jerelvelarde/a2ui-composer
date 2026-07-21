@@ -19,9 +19,67 @@
   height: 100%;
 }
 
-.gallery-container {
+.gallery-shell {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  box-sizing: border-box;
+}
+
+.gallery-toolbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding: var(--cpk-space-2, 8px) var(--cpk-space-3, 12px);
+  border-bottom: 1px solid var(--cpk-divider, rgba(0, 0, 0, 0.08));
+}
+
+.gallery-view-switch {
+  border: 1px solid var(--cpk-border);
+  border-radius: var(--cpk-radius-pill, 9999px);
+  overflow: hidden;
+  background: var(--cpk-surface-elevated);
+
+  ::ng-deep .mat-button-toggle-label-content {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cpk-space-2, 8px);
+    line-height: 34px;
+    padding: 0 var(--cpk-space-3, 12px);
+  }
+
+  ::ng-deep .mat-button-toggle {
+    color: var(--cpk-text-secondary);
+  }
+
+  ::ng-deep .mat-button-toggle-checked {
+    background: var(--cpk-accent-bg);
+    color: var(--cpk-accent);
+  }
+
+  ::ng-deep mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.gallery-container {
+  flex: 1 1 auto;
+  min-height: 0;
   width: 100%;
+}
+
+.definition-pane {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: var(--cpk-space-3, 12px);
+  box-sizing: border-box;
+
+  a2ui-composer-monaco-editor {
+    display: block;
+    height: 100%;
+  }
 }
 
 .gallery-sidenav {

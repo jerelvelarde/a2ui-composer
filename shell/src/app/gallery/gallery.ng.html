@@ -14,7 +14,28 @@
  limitations under the License.
 -->
 
-<mat-sidenav-container class="gallery-container">
+<div class="gallery-shell">
+  <div class="gallery-toolbar">
+    <mat-button-toggle-group
+      class="gallery-view-switch"
+      [value]="viewMode()"
+      (change)="setViewMode($event.value)"
+      aria-label="Gallery view"
+      hideSingleSelectionIndicator
+    >
+      <mat-button-toggle value="components">
+        <mat-icon aria-hidden="true">widgets</mat-icon>
+        <span class="view-label">Components</span>
+      </mat-button-toggle>
+      <mat-button-toggle value="definition">
+        <mat-icon aria-hidden="true">data_object</mat-icon>
+        <span class="view-label">Definition</span>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  @if (viewMode() === 'components') {
+    <mat-sidenav-container class="gallery-container">
   <mat-sidenav mode="side" opened class="gallery-sidenav">
     <mat-nav-list class="catalog-list">
       @for (group of componentsList(); track group.category) {
@@ -159,4 +180,23 @@
       </div>
     }
   </mat-sidenav-content>
-</mat-sidenav-container>
+    </mat-sidenav-container>
+  } @else {
+    <div class="definition-pane">
+      @if (catalogDefinition()) {
+        <a2ui-composer-monaco-editor
+          [value]="catalogDefinition()"
+          [readOnly]="true"
+        ></a2ui-composer-monaco-editor>
+      } @else {
+        <div class="empty-state">
+          <mat-icon class="empty-icon">data_object</mat-icon>
+          <h3 class="empty-title">No Catalog Resolved</h3>
+          <p class="empty-subtitle">
+            Connect a renderer in Settings to load a catalog, then its definition appears here.
+          </p>
+        </div>
+      }
+    </div>
+  }
+</div>
