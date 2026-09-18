@@ -8,3 +8,7 @@ Actual production-browser recordings; no live model calls or API keys.
 MP4 files preserve full-resolution playback; GIF files are embedded in PR descriptions.
 
 - Theme: `a797f3be1133e3c7b1aa23132cd42e0a548b456d`. Shared light/dark styling and live renderer controls; saved layout places the assistant in an inactive tab. Input and action survive theme toggles. No source/CSS/DOM overrides.
+
+## Theme review follow-up
+
+`theme-review.gif` and `theme-review.mp4` show the production UI at `7341d5261a1799dddfb9e1ea9c77625b637de134`: softer light surfaces, dark/light theme switching, and a working renderer action with its input preserved. Recorded in Google Chrome at 1280×800 with no API key or live model request. The panel arrangement is a saved workspace layout, with no CSS or DOM overrides.
