@@ -6,3 +6,5 @@ Actual production-browser recordings; no live model calls or API keys.
 - Settings: `af5033c6f0ec7fdcf530f681371863ba6c3b5b04`. Desktop and mobile layouts, light/dark themes.
 
 MP4 files preserve full-resolution playback; GIF files are embedded in PR descriptions.
+
+- Theme: `a797f3be1133e3c7b1aa23132cd42e0a548b456d`. Shared light/dark styling and live renderer controls; saved layout places the assistant in an inactive tab. Input and action survive theme toggles. No source/CSS/DOM overrides.
